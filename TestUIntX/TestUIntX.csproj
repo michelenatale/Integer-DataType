@@ -7,7 +7,12 @@
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <IsPublishable>False</IsPublishable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="UInt512Ex\" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\UIntX\UIntX.csproj" />

@@ -76,10 +76,15 @@ public class TestUInt128Ex
     uint ui32 = 5;
     instance = new UInt128Ex(ui32);
 
+    ulong ui64 = 5;
+    instance = new UInt128Ex(ui64);
+
     //signed
 
     int i32 = 5;
     instance = new UInt128Ex(i32);
+
+    var instance2 = new UInt128Ex(instance);
   }
 
   private static void TestConverts()
@@ -98,10 +103,10 @@ public class TestUInt128Ex
     instance = (UInt128Ex)flt;
 
     double dbl = 5.0;
-    instance = (UInt128Ex)(dbl);
+    instance = (UInt128Ex)dbl;
 
     decimal dec = -5m;
-    instance = (UInt128Ex)(dec);
+    instance = (UInt128Ex)dec;
   }
 
   private static void TestMethodes()
@@ -137,13 +142,13 @@ public class TestUInt128Ex
     var decstr = instance.ToString(10);
     var hexstr = instance.ToString(16);
 
-    var ui128 = UInt128Ex.FromDualSystem(binstr);
+    var ui128 = UInt128Ex.Parse(binstr,2);
 
-    ui128 = UInt128Ex.FromOctalSystem(octstr);
+    ui128 = UInt128Ex.Parse(octstr,8);
 
-    ui128 = UInt128Ex.FromDecimalSystem(decstr);
+    ui128 = UInt128Ex.Parse(decstr,10);
 
-    ui128 = UInt128Ex.FromHexSystem(hexstr);
+    ui128 = UInt128Ex.Parse(hexstr,16);
   }
 
   private static void TestParse()

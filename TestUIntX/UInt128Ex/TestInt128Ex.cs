@@ -163,13 +163,13 @@ public class TestInt128Ex
     var decstr = instance.ToString(10);
     var hexstr = instance.ToString(16);
 
-    var i128 = Int128Ex.FromDecimalSystem(decstr);
+    var i128 = Int128Ex.Parse(decstr,10);
 
-    i128 = Int128Ex.FromDualSystem(binstr);
+    i128 = Int128Ex.Parse(binstr,2);
 
-    i128 = Int128Ex.FromOctalSystem(octstr);
+    i128 = Int128Ex.Parse(octstr,8);
 
-    i128 = Int128Ex.FromHexSystem(hexstr);
+    i128 = Int128Ex.Parse(hexstr,16);
   }
 
   private static void TestParse()

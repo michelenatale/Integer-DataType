@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 
 namespace michele.natale.Numbers;
 
-
 /// <summary>
 /// Represends a 128-Bit signed integer
 /// </summary>
@@ -29,19 +28,19 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   public readonly bool IsZero
   {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    get => this.LOHI == 0;
+    get => this.LOHI.IsZero;
   }
 
   public readonly bool IsOne
   {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    get => this.LOHI == 1;
+    get => this.LOHI.IsOne;
   }
 
   public readonly bool IsMinusOne
   {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    get => this.LOHI == UInt128Ex.MaxValue;
+    get => this.LOHI .IsMinusOne;
   }
 
   public static Int128Ex MaxValue
@@ -64,8 +63,8 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     get
     {
+      if (this.LOHI.IsZero) return 0;
       var lohi = this.LOHI.ToValues();
-      if (lohi[0] == 0 && lohi[1] == 0) return 0;
       return lohi[1] < 0x8000_0000_0000_0000ul ? 1 : -1;
     }
   }
@@ -217,7 +216,6 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
 
   #endregion
-
 
   #region Numeric Operation
 
@@ -496,7 +494,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int128Ex Pow(Int128Ex value, int exp)
-  {
+  {  
     var ui128 = UInt128Ex.Pow(Abs(value).LOHI, exp);
     var result = (Int128Ex)ui128;
     if (value.Sign == result.Sign)
@@ -527,19 +525,19 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public Span<byte> ToSpan(in bool littleendian = true)
+  public Span<byte> ToSpan(bool littleendian = true)
   {
     return this.ToBytes(littleendian);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public ulong[] ToValues(in bool littleendian = true)
+  public ulong[] ToValues(bool littleendian = true)
   {
     return this.LOHI.ToValues(littleendian);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public byte[] ToBytes(in bool littleendian = true)
+  public byte[] ToBytes(bool littleendian = true)
   {
     var lo_hi = this.ToValues(true);
     var result = new byte[TypeSize];
@@ -583,7 +581,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     if (ulongs.Length > TypeSize / 8) throw new ArgumentOutOfRangeException(nameof(ulongs));
 
     var bits = new ulong[TypeSize / 8];
-    Array.Copy(ulongs.ToArray(),bits, TypeSize / 8); 
+    Array.Copy(ulongs.ToArray(),bits, ulongs.Length * 8); 
     if (!littleendian) Array.Reverse(bits);
 
     return new Int128Ex(bits[1], bits[0]);
@@ -592,7 +590,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   #region Internal Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static ulong[] BitwiseAnd(in ulong[] left, in ulong right, in int typesize)
+  public static ulong[] BitwiseAnd(ulong[] left, in ulong right, in int typesize)
   {
     var result = new ulong[typesize];
     if (left.SequenceEqual(result)) return result;
@@ -604,7 +602,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static ulong[] BitwiseAnd(in ulong[] left, in ulong[] right, in int typesize)
+  public static ulong[] BitwiseAnd(ulong[] left, in ulong[] right, in int typesize)
   {
     var result = new ulong[typesize];
     for (var i = 0; i < typesize; i++)
@@ -681,7 +679,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
   #endregion
 
-  #region Formatting Methodes
+  #region Formating Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public override string ToString()
@@ -690,7 +688,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly string ToString(in int radix)
+  public readonly string ToString(int radix)
   {
     if (!new[] { 2, 8, 10, 16 }.Contains(radix))
       throw new ArgumentOutOfRangeException(nameof(radix));
@@ -700,7 +698,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
     return radix switch
     {
-      2 => ToDualSystem(bytes, this.Sign),
+      2 => ToBinSystem(bytes, this.Sign),
       8 => ToOctalSystem(bytes, this.Sign),
       10 => ToDecimalSystem(bytes, this.Sign),
       16 => ToHexSystem(bytes, this.Sign),
@@ -725,62 +723,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static Int128Ex FromDualSystem(ReadOnlySpan<char> binstr)
-  {
-    if (binstr.Length == 0) return new Int128Ex();
-    if (binstr.Length == 1 && binstr[0] == 0) return new Int128Ex();
-
-    var bytes = binstr.ToArray().Select(c => byte.Parse(c.ToString()));
-    return ToInt128Ex(Converter(bytes.ToArray(), 2, 256).Reverse().ToArray());
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static Int128Ex FromOctalSystem(ReadOnlySpan<char> octalstr)
-  {
-    if (octalstr.Length == 0) return new Int128Ex();
-    if (octalstr.Length == 1 && octalstr[0] == 0) return new Int128Ex();
-
-    var bytes = octalstr.ToArray().Select(c => byte.Parse(c.ToString()));
-    return ToInt128Ex(Converter(bytes.ToArray(), 8, 256).Reverse().ToArray());
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static Int128Ex FromDecimalSystem(ReadOnlySpan<char> decimalstr)
-  {
-    if (decimalstr.Length == 0) return new Int128Ex();
-    if (decimalstr.Length == 1 && decimalstr[0] == 0) return new Int128Ex();
-
-    byte[] bytes;
-    var sign = decimalstr[0] == '-';
-    if (sign) bytes = decimalstr[1..].ToArray().Select(c => byte.Parse(c.ToString())).ToArray();
-    else bytes = decimalstr.ToArray().Select(c => byte.Parse(c.ToString())).ToArray();
-
-    bytes = Converter(bytes, 10, 256);
-    Array.Reverse(bytes);
-    if (!sign) return ToInt128Ex(bytes);
-
-    var uints = new uint[TypeSize / 4];
-    Buffer.BlockCopy(bytes, 0, uints, 0, bytes.Length);
-    return ToInt128Ex(TwosComplement(uints));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static Int128Ex FromHexSystem(ReadOnlySpan<char> hexstr)
-  {
-    if (hexstr.Length == 0) return new Int128Ex();
-    if (hexstr.Length == 1 && hexstr[0] == 0) return new Int128Ex();
-
-    var h = "0123456789ABCDEF";
-    var dict = new Dictionary<char, byte>();
-    for (byte i = 0; i < h.Length; i++)
-      dict[h[i]] = i;
-
-    var bytes = hexstr.ToArray().Select(c => dict[c]);
-    return ToInt128Ex(Converter(bytes.ToArray(), 16, 256).Reverse().ToArray());
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static string ToDualSystem(ReadOnlySpan<byte> bytes, int sign)
+  private static string ToBinSystem(ReadOnlySpan<byte> bytes, int sign)
   {
     if (sign == 0) return "0";
     //Wenn es sich um eine positive Zahl handelt,
@@ -981,110 +924,45 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     return new(lohi[1], lohi[0]);
   }
 
-  #endregion
-
-  #region Conversion to Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public TypeCode GetTypeCode()
+  public static explicit operator Int128Ex(Int256Ex value)
   {
-    return TypeCode.Object;
+    var lohi = value.ToValues();
+    return new(lohi[1], lohi[0]);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public bool ToBoolean(IFormatProvider? provider)
+  public static explicit operator checked Int128Ex(Int256Ex value)
   {
-    return !this.IsZero;
+    if (value.Sign == 0) return new();
+
+    var v = value.ToValues();
+    if (value.Sign == 1) { 
+    if (v[1] >= 0x8000_0000_0000_0000ul)
+      throw new OverflowException(nameof(value));
+      return new(v[1],v[0]);
+    }
+    if (v[3] >= 0x8000_0000_0000_0000ul)
+      throw new OverflowException(nameof(value));
+    return new(v[3], v[2]);
+  }
+
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator Int128Ex(UInt256Ex value)
+  {
+    var lohi = value.ToValues();
+    return new(lohi[1], lohi[0]);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public byte ToByte(IFormatProvider? provider)
+  public static explicit operator checked Int128Ex(UInt256Ex value)
   {
-    return (byte)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public char ToChar(IFormatProvider? provider)
-  {
-    return (char)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public DateTime ToDateTime(IFormatProvider? provider)
-  {
-    return Convert.ToDateTime(this.ToDecimal(provider), provider);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public decimal ToDecimal(IFormatProvider? provider)
-  {
-    return (decimal)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public double ToDouble(IFormatProvider? provider)
-  {
-    return (double)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public short ToInt16(IFormatProvider? provider)
-  {
-    return (short)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public int ToInt32(IFormatProvider? provider)
-  {
-    return (int)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public long ToInt64(IFormatProvider? provider)
-  {
-    return (long)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public sbyte ToSByte(IFormatProvider? provider)
-  {
-    return (sbyte)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public float ToSingle(IFormatProvider? provider)
-  {
-    return (float)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public string ToString(IFormatProvider? provider)
-  {
-    throw new NotImplementedException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public object ToType(Type conversionType, IFormatProvider? provider)
-  {
-    throw new NotImplementedException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public ushort ToUInt16(IFormatProvider? provider)
-  {
-    return (ushort)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public uint ToUInt32(IFormatProvider? provider)
-  {
-    return (uint)this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public ulong ToUInt64(IFormatProvider? provider)
-  {
-    return (ulong)this;
+    var lohi = value.ToValues();
+    if (lohi[1] >= 0x8000_0000_0000_0000ul)
+      throw new OverflowException(nameof(value));
+    return new(lohi[1], lohi[0]);
   }
 
   #endregion
@@ -1092,6 +970,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   #endregion
 
   #region Conversion from Int128Ex
+
   #region Implicit Conversion from Int128Ex
   #endregion
 
@@ -1356,6 +1235,112 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
   #endregion
 
+  #region Conversion to Methodes
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public TypeCode GetTypeCode()
+  {
+    return TypeCode.Object;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public bool ToBoolean(IFormatProvider? provider)
+  {
+    return !this.IsZero;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public byte ToByte(IFormatProvider? provider)
+  {
+    return (byte)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public char ToChar(IFormatProvider? provider)
+  {
+    return (char)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public DateTime ToDateTime(IFormatProvider? provider)
+  {
+    return Convert.ToDateTime(this.ToDecimal(provider), provider);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public decimal ToDecimal(IFormatProvider? provider)
+  {
+    return (decimal)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public double ToDouble(IFormatProvider? provider)
+  {
+    return (double)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public short ToInt16(IFormatProvider? provider)
+  {
+    return (short)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public int ToInt32(IFormatProvider? provider)
+  {
+    return (int)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public long ToInt64(IFormatProvider? provider)
+  {
+    return (long)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public sbyte ToSByte(IFormatProvider? provider)
+  {
+    return (sbyte)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public float ToSingle(IFormatProvider? provider)
+  {
+    return (float)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public string ToString(IFormatProvider? provider)
+  {
+    throw new NotImplementedException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public object ToType(Type conversionType, IFormatProvider? provider)
+  {
+    throw new NotImplementedException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public ushort ToUInt16(IFormatProvider? provider)
+  {
+    return (ushort)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public uint ToUInt32(IFormatProvider? provider)
+  {
+    return (uint)this;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public ulong ToUInt64(IFormatProvider? provider)
+  {
+    return (ulong)this;
+  }
+
+  #endregion
+
   #endregion
 
   #region Parsing
@@ -1371,17 +1356,216 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
     return radix switch
     {
-      2 => FromDualSystem(value),
-      8 => FromOctalSystem(value),
-      10 => FromDecimalSystem(value),
+      2 => FromBinSystem(value),
+      8 => FromOctSystem(value),
+      10 => FromDecSystem(value),
       16 => FromHexSystem(value),
       _ => throw new ArgumentException("radix 2, 8, 10, 16", nameof(radix)),
     };
   }
 
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static Int128Ex FromDecSystem(ReadOnlySpan<char> value)
+  {
+    var sign = value[0] == '-';
+    if (value.Length == 0) return new Int128Ex();
+    var cap = 1 + (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize * 8)));
+    var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
+    val = val.Replace("-", string.Empty);
+
+    if (val.Length == 0) return new Int128Ex();
+    if (val.Length == 1 && val[0] == '0') return new Int128Ex();
+    if (val.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
+
+    var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
+    var bytes = Converter(bytesvalue, 10, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, TypeSize);
+    if (!sign) return ToInt128Ex(bytes);
+
+    var uints = new uint[TypeSize / 4];
+    Buffer.BlockCopy(bytes, 0, uints, 0, bytes.Length);
+    return ToInt128Ex(TwosComplement(uints));
+
+    //var bytes = new byte[TypeSize];
+    //Array.Copy(tmp, bytes, TypeSize);
+
+    //var result = new ulong[TypeSize / 8];
+    //Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
+    //return new Int128Ex(result[1],result[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static Int128Ex FromBinSystem(ReadOnlySpan<char> value)
+  {
+    if (value.Length == 0) return new Int128Ex();
+    var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
+    if (val.Length == 0) return new Int128Ex();
+    if (val.Length == 1 && val[0] == '0') return new Int128Ex();
+    if (val.Length > TypeSize * 8 + 1) throw new ArgumentOutOfRangeException(nameof(value));
+
+    var length = RealLength(val, TypeSize * 8) / 8;
+    var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
+    var tmp = Converter(bytesvalue, 2, 256);
+    Array.Reverse(tmp);
+    Array.Resize(ref tmp, length);
+    return ToInt128Ex(tmp);
+
+    //var bytes = new byte[TypeSize];
+    //Array.Copy(tmp, bytes, TypeSize);
+
+    //var result = new ulong[TypeSize / 8];
+    //Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
+    //return new Int128Ex(result[1],result[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static Int128Ex FromOctSystem(ReadOnlySpan<char> value)
+  {
+    if (value.Length == 0) return new Int128Ex();
+
+    var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
+    if (val.Length == 0) return new Int128Ex();
+    if (val.Length == 1 && val[0] == '0') return new Int128Ex();
+    int cap = Convert.ToInt32(TypeSize * Math.Log(256) / Math.Log(8)) + 1;
+    if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
+
+    var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
+    var tmp = Converter(bytesvalue, 8, 256);
+    Array.Reverse(tmp);
+    Array.Resize(ref tmp, TypeSize);
+    return ToInt128Ex(tmp);
+
+    //var bytes = new byte[TypeSize];
+    //Array.Copy(tmp, bytes, TypeSize);
+
+    //var result = new ulong[TypeSize / 8];
+    //Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
+    //return new Int128Ex(result[1],result[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static Int128Ex FromHexSystem(ReadOnlySpan<char> value)
+  {
+    if (value.Length == 0) return new Int128Ex();
+
+    var hex = "0123456789ABCDEF";
+    var dict = new Dictionary<char, byte>();
+    for (byte i = 0; i < hex.Length; i++)
+      dict[hex[i]] = i;
+
+    var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
+    if (val.Length == 0) return new Int128Ex();
+    if (val.Length == 1 && val[0] == '0') return new Int128Ex();
+    int cap = Convert.ToInt32(TypeSize * Math.Log(256) / Math.Log(16)) + 1;
+    if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
+
+    var bytes = TrimFirst(val).ToArray().Select(s => dict[s]).ToArray();
+    var tmp = Converter(bytes, 16, 256);
+    Array.Reverse(tmp);
+    Array.Resize(ref tmp, TypeSize);
+    return ToInt128Ex(tmp);
+
+    //bytes = new byte[TypeSize];
+    //Array.Copy(tmp, bytes, TypeSize);
+
+    //var result = new ulong[TypeSize / 8];
+    //Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
+    //return new Int128Ex(result[1],result[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static ReadOnlySpan<char> TrimFirst(ReadOnlySpan<char> data)
+  {
+    var count = 0;
+    var length = data.Length;
+    for (var i = 0; i < length; i++)
+      if (data[i] == '0') { count++; }
+      else break;
+
+    return data[count..length].ToArray();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static int CountZerosInFirst(ReadOnlySpan<char> data)
+  {
+    var count = 0;
+    var length = data.Length;
+    for (var i = 0; i < length; i++)
+      if (data[i] == '0') { count++; }
+      else break;
+    return count;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static int RealLength(ReadOnlySpan<char> data, int typesize)
+  {
+    var cz = CountZerosInFirst(data);
+    var length = data.Length - cz;
+    while (length++ % typesize != 0) ;
+    return length - 1;
+  }
+
+  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+  //private static Int128Ex FromBinSystem(ReadOnlySpan<char> binstr)
+  //{
+  //  if (binstr.Length == 0) return new Int128Ex();
+  //  if (binstr.Length == 1 && binstr[0] == 0) return new Int128Ex();
+
+  //  var bytes = binstr.ToArray().Select(c => byte.Parse(c.ToString()));
+  //  return ToInt128Ex(Converter(bytes.ToArray(), 2, 256).Reverse().ToArray());
+  //}
+
+  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+  //private static Int128Ex FromOctalSystem(ReadOnlySpan<char> octalstr)
+  //{
+  //  if (octalstr.Length == 0) return new Int128Ex();
+  //  if (octalstr.Length == 1 && octalstr[0] == 0) return new Int128Ex();
+
+  //  var bytes = octalstr.ToArray().Select(c => byte.Parse(c.ToString()));
+  //  return ToInt128Ex(Converter(bytes.ToArray(), 8, 256).Reverse().ToArray());
+  //}
+
+  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+  //private static Int128Ex FromDecimalSystem(ReadOnlySpan<char> decimalstr)
+  //{
+  //  if (decimalstr.Length == 0) return new Int128Ex();
+  //  if (decimalstr.Length == 1 && decimalstr[0] == 0) return new Int128Ex();
+
+  //  byte[] bytes;
+  //  var sign = decimalstr[0] == '-';
+  //  if (sign) bytes = decimalstr[1..].ToArray().Select(c => byte.Parse(c.ToString())).ToArray();
+  //  else bytes = decimalstr.ToArray().Select(c => byte.Parse(c.ToString())).ToArray();
+
+  //  bytes = Converter(bytes, 10, 256);
+  //  Array.Reverse(bytes);
+  //  if (!sign) return ToInt128Ex(bytes);
+
+  //  var uints = new uint[TypeSize / 4];
+  //  Buffer.BlockCopy(bytes, 0, uints, 0, bytes.Length);
+  //  return ToInt128Ex(TwosComplement(uints));
+  //}
+
+  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+  //private static Int128Ex FromHexSystem(ReadOnlySpan<char> hexstr)
+  //{
+  //  if (hexstr.Length == 0) return new Int128Ex();
+  //  if (hexstr.Length == 1 && hexstr[0] == 0) return new Int128Ex();
+
+  //  var h = "0123456789ABCDEF";
+  //  var dict = new Dictionary<char, byte>();
+  //  for (byte i = 0; i < h.Length; i++)
+  //    dict[h[i]] = i;
+
+  //  var bytes = hexstr.ToArray().Select(c => dict[c]);
+  //  return ToInt128Ex(Converter(bytes.ToArray(), 16, 256).Reverse().ToArray());
+  //}
+
   #endregion
 
   #region TryParsing
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static bool TryParse(ReadOnlySpan<char> value, out Int128Ex i128)
   {
@@ -1396,7 +1580,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     for (int i = 0; i < value.Length; i++)
     {
       if ("0123456789".Contains(value[i]))
-        i128 = i128 * 10 + Convert.ToUInt32(value[i]);
+        i128 = i128 * 10 + uint.Parse(value[i].ToString());
       else
       {
         i128 = 0;
@@ -1409,14 +1593,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
   #endregion
   #endregion
-  #endregion
 
-
-
-
-
-
-
-
+  #endregion 
 
 }

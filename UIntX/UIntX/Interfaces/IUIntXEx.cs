@@ -49,28 +49,28 @@ internal interface IUIntXEx<T>
   /// </summary>
   /// <param name="radix">Decimal, Octal, Hex or Bit-Value</param>
   /// <returns>Returns the current value as a string.</returns>
-  unsafe string ToString(in int radix);
+  unsafe string ToString(int radix);
 
   /// <summary>
   /// Returns the current value as a span<byte>.
   /// </summary>
   /// <param name="littleendian">Yes for littleendian, otherwise false.</param>
   /// <returns>Returns the current value as a span<byte>.</returns>
-  Span<byte> ToSpan(in bool littleendian = true);
+  Span<byte> ToSpan(bool littleendian = true);
 
   /// <summary>
   /// Returns the current value as a array of byte.
   /// </summary>
   /// <param name="littleendian">Yes for littleendian, otherwise false.</param>
   /// <returns>Returns the current value as a array of byte.</returns>
-  byte[] ToBytes(in bool littleendian = true);
+  byte[] ToBytes(bool littleendian = true);
 
   /// <summary> 
   /// Returns the current value as a array of uint.
   /// </summary>
   /// <param name="littleendian">Yes for littleendian, otherwise false.</param>
   /// <returns>Returns the current value as a array of ulong.</returns>
-  ulong[] ToValues(in bool littleendian = true);
+  ulong[] ToValues(bool littleendian = true);
 
   /// <summary>
   /// Returns a copy from the current value.
@@ -80,4 +80,43 @@ internal interface IUIntXEx<T>
 
 }
 
+
+
+
+//internal abstract class AUIntXEx<T> : IUIntXEx<T>
+//{
+//  public bool IsZero => throw new NotImplementedException();
+
+//  public bool IsOne => throw new NotImplementedException();
+
+//  public bool IsMinusOne => throw new NotImplementedException();
+
+//  public T Copy() => throw new NotImplementedException();
+//  public void CopyTo(Span<byte> bytes, in bool littleendian = true) => throw new NotImplementedException();
+//  public byte[] ToBytes(bool littleendian = true) => throw new NotImplementedException();
+//  public Span<byte> ToSpan(bool littleendian = true) => throw new NotImplementedException();
+//  public string ToString(int radix) => throw new NotImplementedException();
+//  public ulong[] ToValues(bool littleendian = true) => throw new NotImplementedException();
+
+
+
+
+//}
+
+
+//[StructLayout(LayoutKind.Explicit)]
+//internal class UInt128E: AUIntXEx<UInt128E>
+//{
+//  [FieldOffset(0)]
+//  private ulong HI = 0;
+
+//  [FieldOffset(8)]
+//  private ulong LO = 0;
+
+//  public UInt128E()
+//  {
+//    this.HI = this.LO = 0;
+//  }
+
+//}
 

@@ -1,5 +1,5 @@
 ﻿
-
+ 
 using System.Text;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -7,7 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace michele.natale.Numbers;
-
 
 /// <summary>
 /// Represends a 128-Bit unsigned integer
@@ -92,19 +91,20 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   /// <param name="number"></param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt128Ex(UInt128Ex number)
+  public UInt128Ex(in UInt128Ex number)
   {
     this.HI = number.HI;
     this.LO = number.LO;
   }
 
   /// <summary>
-  /// Copy values
+  /// Constructor - Copy values
   /// </summary>
-  /// <param name="number"></param>
+  /// <param name="hi">High value bits.</param>
+  /// <param name="lo">Low value bits.</param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt128Ex(in ulong hi, in ulong lo)
+  public UInt128Ex(ulong hi, ulong lo)
   {
     this.HI = hi;
     this.LO = lo;
@@ -113,19 +113,29 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   /// <summary>
   /// Copy values
   /// </summary>
-  /// <param name="number"></param>
+  /// <param name="lo">Lo value bits.</param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt128Ex(in long lo)
+  public UInt128Ex(long lo)
   {
     this.LO = (ulong)lo;
     this.HI = (ulong)(lo >> 63);
+  }
+  /// <summary>
+  /// Copy values
+  /// </summary>
+  /// <param name="lo">Low value bits.</param>
+  /// <remarks>Created by © Michele Natale</remarks>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public UInt128Ex(ulong lo)
+  {
+    this.LO = lo;
+    this.HI = 0;
   }
 
   #endregion
 
   #region Operators
-
 
   #region Bitwise
 
@@ -585,7 +595,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static UInt128Ex PowerOfTen(int exp, out bool overflow)
   {
-    var uints = PowerOfTwo(exp, TypeSize / 4, out overflow);
+    var uints = PowerOfTen(exp, TypeSize / 4, out overflow);
     if (overflow) return new UInt128Ex();
 
     var lohi = new ulong[TypeSize / 8];
@@ -597,13 +607,13 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   public static bool IsPowerTwo(UInt128Ex value) => PopCount(value) == 1u;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public Span<byte> ToSpan(in bool littleendian = true)
+  public Span<byte> ToSpan(bool littleendian = true)
   {
     return this.ToBytes(littleendian);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public byte[] ToBytes(in bool littleendian = true)
+  public byte[] ToBytes(bool littleendian = true)
   {
     var lo_hi = new ulong[] { this.LO, this.HI };
     var result = new byte[TypeSize];
@@ -613,7 +623,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public ulong[] ToValues(in bool littleendian = true)
+  public ulong[] ToValues(bool littleendian = true)
   {
     if (littleendian) return new ulong[] { this.LO, this.HI };
     return new ulong[] { this.HI, this.LO };
@@ -711,10 +721,12 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] PowerOfTen(int exp, int tsize, out bool overflow)
   {
+    if (exp < 0)
+      throw new ArgumentOutOfRangeException(nameof(exp));
+
     overflow = true;
-    var max = 1 + (int)double.Truncate(Math.Log10(Math.Pow(2, 4 * tsize)));
-    if (exp >= max)
-      return new uint[tsize];
+    var max = (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize * 8)));
+    if (exp > max) return new uint[tsize];
 
     overflow = false;
     if (exp == 0) { var a = new uint[tsize]; a[0] = 1; return a; }
@@ -724,12 +736,11 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     var expui = result.ToArray();
     for (var i = 1; i < exp; i++)
       result = Multiplication(result, expui, tsize, out overflow);
-    if (exp >= (max - 1)) overflow = true;
+    if (exp > max) overflow = true;
     return result;
   }
 
-
-  [SkipLocalsInit]
+ 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] PowerOfTwo(int exp, int tsize, out bool overflow)
   {
@@ -749,10 +760,9 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     if (exp >= max) overflow = true;
     return result;
   }
-
-  [SkipLocalsInit]
+ 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static uint[] Multiplication(in uint[] left, in uint[] right, int tsize, out bool over_flow)
+  private static uint[] Multiplication(uint[] left, in uint[] right, int tsize, out bool over_flow)
   {
     int index;
     ulong remainder;
@@ -792,7 +802,8 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
 
   [SkipLocalsInit]
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  internal static UInt128Ex PopCount(UInt128Ex value) => ulong.PopCount(value.LO) + ulong.PopCount(value.HI);
+  internal static UInt128Ex PopCount(UInt128Ex value) => 
+    ulong.PopCount(value.LO) + ulong.PopCount(value.HI);
 
   [SkipLocalsInit]
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -817,7 +828,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly unsafe string ToString(in int radix)
+  public readonly unsafe string ToString(int radix)
   {
     if (!new[] { 2, 8, 10, 16 }.Contains(radix))
       throw new ArgumentOutOfRangeException(nameof(radix));
@@ -836,44 +847,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
       16 => ToHexSystem(bytes),
       _ => throw new ArgumentOutOfRangeException(nameof(radix)),
     };
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt128Ex FromDualSystem(ReadOnlySpan<char> binstr)
-  {
-    var bytes = binstr.ToArray().Skip(1).Select(c => byte.Parse(c.ToString()));
-
-    return ToUInt128Ex(Converter(bytes.ToArray(), 2, 256).Reverse().ToArray());
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt128Ex FromOctalSystem(ReadOnlySpan<char> octalstr)
-  {
-    var bytes = octalstr.ToArray().Select(c => byte.Parse(c.ToString()));
-
-    return ToUInt128Ex(Converter(bytes.ToArray(), 8, 256).Reverse().ToArray());
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt128Ex FromDecimalSystem(ReadOnlySpan<char> decimalstr)
-  {
-    var bytes = decimalstr.ToArray().Select(c => byte.Parse(c.ToString()));
-
-    return ToUInt128Ex(Converter(bytes.ToArray(), 10, 256).Reverse().ToArray());
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt128Ex FromHexSystem(ReadOnlySpan<char> hexstr)
-  {
-    var h = "0123456789ABCDEF";
-    var dict = new Dictionary<char, byte>();
-    for (byte i = 0; i < h.Length; i++)
-      dict[h[i]] = i;
-
-    var bytes = hexstr.ToArray().Select(c => dict[c]);
-
-    return ToUInt128Ex(Converter(bytes.ToArray(), 16, 256).Reverse().ToArray());
-  }
+  } 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static string ToDualSystem(ReadOnlySpan<byte> bytes)
@@ -947,6 +921,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   #endregion
 
   #region Conversion and Parse
+
   #region Conversion to UInt128Ex
 
   #region Implicit Conversion to UInt128Ex
@@ -1097,6 +1072,8 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     return new(result[1], result[0]);
   }
 
+
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator UInt128Ex(Int128Ex value)
   {
@@ -1112,6 +1089,40 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     var values = value.ToValues();
     return new(values[1], values[0]);
   }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt128Ex(Int256Ex value)
+  {
+    var values = value.ToValues();
+    return new(values[1], values[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt128Ex(Int256Ex value)
+  {
+    if (value.Sign == -1) throw new OverflowException(nameof(value));
+
+    var values = value.ToValues();
+    return new(values[1], values[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt128Ex(UInt256Ex value)
+  {
+    var values = value.ToValues();
+    return new(values[1], values[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt128Ex(UInt256Ex value)
+  {
+    if (value > MaxValue) throw new OverflowException(nameof(value));
+
+    var values = value.ToValues();
+    return new(values[1], values[0]);
+  }
+
+  #region Internal Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static UInt128Ex ToUInt128Ex(double value)
@@ -1139,6 +1150,8 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
 
     return result;
   }
+
+  #endregion
 
   #endregion
 
@@ -1398,22 +1411,24 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
 
     return radix switch
     {
-      2 => ToBinSystem(value),
-      8 => ToOctSystem(value),
-      10 => ToDecSystem(value),
-      16 => ToHexSystem(value),
+      2 => FromBinSystem(value),
+      8 => FromOctSystem(value),
+      10 => FromDecSystem(value),
+      16 => FromHexSystem(value),
       _ => throw new ArgumentException("radix 2, 8, 10, 16", nameof(radix)),
     };
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static UInt128Ex ToDecSystem(ReadOnlySpan<char> value)
+  private static UInt128Ex FromDecSystem(ReadOnlySpan<char> value)
   {
     if (value.Length == 0) return new UInt128Ex();
-    var l = 1 + (int)double.Truncate(Math.Log10(Math.Pow(2, 128)));
-    if (value.Length > l) throw new ArgumentOutOfRangeException(nameof(value));
-
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
+    if (val.Length == 0) return new UInt128Ex();
+    if (val.Length == 1 && val[0] == '0') return new UInt128Ex();
+    var cap = 1 + (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize* 8)));
+    if (val.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
+    
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
     var tmp = Converter(bytesvalue, 10, 256);
     Array.Reverse(tmp);
@@ -1428,14 +1443,14 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static UInt128Ex ToBinSystem(ReadOnlySpan<char> value)
+  private static UInt128Ex FromBinSystem(ReadOnlySpan<char> value)
   {
-
     if (value.Length == 0) return new UInt128Ex();
-    if (value.Length > TypeSize * 8 + 1)
-      throw new ArgumentOutOfRangeException(nameof(value));
-
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
+    if (val.Length == 0) return new UInt128Ex();
+    if (val.Length == 1 && val[0] == '0') return new UInt128Ex();
+    if (val.Length > TypeSize * 8 + 1) throw new ArgumentOutOfRangeException(nameof(value));
+
     var length = RealLength(val, TypeSize * 8) / 8;
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
     var tmp = Converter(bytesvalue, 2, 256);
@@ -1451,12 +1466,15 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static UInt128Ex ToOctSystem(ReadOnlySpan<char> value)
+  private static UInt128Ex FromOctSystem(ReadOnlySpan<char> value)
   {
     if (value.Length == 0) return new UInt128Ex();
-    if (value.Length > 44) throw new ArgumentOutOfRangeException(nameof(value));
-
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
+    if (val.Length == 0) return new UInt128Ex();
+    if (val.Length == 1 && val[0] == '0') return new UInt128Ex();
+    int cap = Convert.ToInt32(TypeSize * Math.Log(256) / Math.Log(8)) + 1;
+    if (val.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
+
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
     var tmp = Converter(bytesvalue, 8, 256);
     Array.Reverse(tmp);
@@ -1471,18 +1489,20 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static UInt128Ex ToHexSystem(ReadOnlySpan<char> value)
+  private static UInt128Ex FromHexSystem(ReadOnlySpan<char> value)
   {
-    if (value.Length == 0) return new UInt128Ex();
-    if (value.Length > 33) throw new ArgumentOutOfRangeException(nameof(value));
+    if (value.Length == 0) return new UInt128Ex(); 
 
     var hex = "0123456789ABCDEF";
-
     var dict = new Dictionary<char, byte>();
     for (byte i = 0; i < hex.Length; i++)
       dict[hex[i]] = i;
 
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
+    if (val.Length == 0) return new UInt128Ex();
+    if (val.Length == 1 && val[0] == '0') return new UInt128Ex();
+    if (val.Length > TypeSize * 2 + 1) throw new ArgumentOutOfRangeException(nameof(value));
+
     var bytes = TrimFirst(val).ToArray().Select(s => dict[s]).ToArray();
     var tmp = Converter(bytes, 16, 256);
     Array.Reverse(tmp);
@@ -1527,9 +1547,11 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     while (length++ % typesize != 0) ;
     return length - 1;
   }
+
   #endregion
 
   #region TryParse
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static bool TryParse(ReadOnlySpan<char> value, out UInt128Ex ui128)
   {
@@ -1541,10 +1563,11 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   public static bool TryParse([NotNullWhen(true)] string value, out UInt128Ex ui128)
   {
     ui128 = 0;
-    for (int i = 0; i < value.Length; i++)
+    var str = value.Replace("_","");
+    for (int i = 0; i < str.Length; i++)
     {
-      if ("0123456789".Contains(value[i]))
-        ui128 = ui128 * 10 + Convert.ToUInt32(value[i]);
+      if ("0123456789".Contains(str[i]))
+        ui128 = ui128 * 10 + ulong.Parse(str[i].ToString());
       else
       {
         ui128 = 0;
@@ -1554,10 +1577,10 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     return true;
   }
 
-
   #endregion
 
   #endregion
+
   #endregion
 }
 

@@ -7,11 +7,10 @@ Imports System.Runtime.InteropServices
 
 Namespace TestUIntX
 
-  Public Module TestUInt128Ex
+  Public Module TestUInt256Ex
 
 
     Public Sub Start()
-      'TestNsc();
 
       TestSizeOf()
       TestInstance()
@@ -56,26 +55,26 @@ Namespace TestUIntX
     End Sub
 
     Private Sub TestSizeOf()
-      Dim type_size = Marshal.SizeOf(Of UInt128Ex)
+      Dim type_size = Marshal.SizeOf(Of UInt256Ex)
     End Sub
 
     Private Sub TestInstance()
-      Dim instance = New UInt128Ex()
+      Dim instance = New UInt256Ex()
 
       'unsigned
 
       Dim ui32 As UInteger = 5
-      instance = New UInt128Ex(ui32)
+      instance = New UInt256Ex(ui32)
 
       Dim ui64 As ULong = 5
-      instance = New UInt128Ex(ui64)
+      instance = New UInt256Ex(ui64)
 
       'signed
 
       Dim i32 = 5
-      instance = New UInt128Ex(i32) 'Convert.ToInt64(i32)
+      instance = New UInt256Ex(i32) 'Convert.ToInt64(i32)
 
-      Dim instance2 = New UInt128Ex(instance)
+      Dim instance2 = New UInt256Ex(instance)
     End Sub
 
     Private Sub TestConverts()
@@ -83,27 +82,29 @@ Namespace TestUIntX
       'unchecked
 
       Dim ui16 As UShort = 5
-      Dim instance = CType(ui16, UInt128Ex)
+      Dim instance = CType(ui16, UInt256Ex)
 
 
       Dim flt = 5.0F
-      instance = CType(flt, UInt128Ex)
+      instance = CType(flt, UInt256Ex)
 
       flt = -flt
-      instance = CType(flt, UInt128Ex)
+      instance = CType(flt, UInt256Ex)
 
       Dim dbl = 5.0
-      instance = CType(dbl, UInt128Ex)
+      instance = CType(dbl, UInt256Ex)
 
       Dim dec = -5D
-      instance = CType(dec, UInt128Ex)
+      instance = CType(dec, UInt256Ex)
     End Sub
 
     Private Sub TestMethodes()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
       Dim bspan = instance.ToSpan()
 
       Dim bytes = instance.ToBytes()
@@ -114,86 +115,89 @@ Namespace TestUIntX
 
       values = instance.ToValues(False)
 
-      Dim ui128 = UInt128Ex.ToUInt128Ex(instance.ToBytes())
+      Dim ui128 = UInt256Ex.ToUInt256Ex(instance.ToBytes())
 
-      ui128 = UInt128Ex.ToUInt128Ex(instance.ToValues())
+      ui128 = UInt256Ex.ToUInt256Ex(instance.ToValues())
     End Sub
 
     Private Sub TestToString()
 
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(lo, hi)
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
       Dim binstr = instance.ToString(2)
       Dim octstr = instance.ToString(8)
       Dim decstr = instance.ToString(10)
       Dim hexstr = instance.ToString(16)
 
-      Dim ui128 = UInt128Ex.Parse(binstr, 2)
+      Dim ui128 = UInt256Ex.Parse(binstr, 2)
 
-      ui128 = UInt128Ex.Parse(octstr, 8)
+      ui128 = UInt256Ex.Parse(octstr, 8)
 
-      ui128 = UInt128Ex.Parse(decstr, 10)
+      ui128 = UInt256Ex.Parse(decstr, 10)
 
-      ui128 = UInt128Ex.Parse(hexstr, 16)
+      ui128 = UInt256Ex.Parse(hexstr, 16)
     End Sub
 
     Private Sub TestParse()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim ui218 = New UInt128(hi, lo)
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
+
       Dim ui = CUInt(instance)
       Dim ll = CLng(instance)
 
       If ui <> Convert.ToUInt32(instance) Then Throw New ArgumentException(Nothing)
       If ll <> Convert.ToInt64(instance) Then Throw New ArgumentException(Nothing)
-
-      If ui <> CUInt(ui218) Then Throw New ArgumentException(Nothing)
-      If ll <> CLng(ui218) Then Throw New ArgumentException(Nothing)
     End Sub
 
     Private Sub TestParseString()
 
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(lo, hi)
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
       Dim binstr = instance.ToString(2)
       Dim octstr = instance.ToString(8)
       Dim decstr = instance.ToString(10)
       Dim hexstr = instance.ToString(16)
 
-      Dim ui128_1 = UInt128Ex.Parse(binstr, 2)
-      Dim ui128_2 = UInt128Ex.Parse(octstr, 8)
-      Dim ui128_3 = UInt128Ex.Parse(decstr, 10)
-      Dim ui128_4 = UInt128Ex.Parse(hexstr, 16)
+      Dim ui128_1 = UInt256Ex.Parse(binstr, 2)
+      Dim ui128_2 = UInt256Ex.Parse(octstr, 8)
+      Dim ui128_3 = UInt256Ex.Parse(decstr, 10)
+      Dim ui128_4 = UInt256Ex.Parse(hexstr, 16)
 
       'bin
       Dim bytes = Enumerable.Range(CInt(0), Rand.[Next](CInt(2), CInt(129))).[Select](Function(x) CByte(CByte(Rand.[Next](CInt(0), CInt(2))))).ToArray()
       bytes = TrimFirstSetOneZero(bytes)
       Dim bits = String.Join("", bytes)
-      Dim ui128 = UInt128Ex.Parse(bits, 2)
+      Dim ui128 = UInt256Ex.Parse(bits, 2)
       Dim strbits = ui128.ToString(2)
 
       'Oct-Systeme können nicht frei gerandomt werden.
       bytes = Enumerable.Range(CInt(0), Rand.[Next](CInt(2), CInt(129))).[Select](Function(x) CByte(CByte(Rand.[Next](CInt(0), CInt(2))))).ToArray()
       bytes = TrimFirstSetOneZero(bytes)
       bits = String.Join("", bytes)
-      ui128 = UInt128Ex.Parse(bits, 2)
+      ui128 = UInt256Ex.Parse(bits, 2)
 
       Dim oct = ui128.ToString(8)
       bits = String.Join("", oct)
-      ui128 = UInt128Ex.Parse(bits, 8)
+      ui128 = UInt256Ex.Parse(bits, 8)
       strbits = ui128.ToString(8)
 
       'dec
       bytes = Enumerable.Range(CInt(0), Rand.[Next](CInt(2), CInt(38))).[Select](Function(x) CByte(CByte(Rand.[Next](CInt(0), CInt(10))))).ToArray()
       bytes = TrimFirstSetOneZero(bytes)
       bits = String.Join("", bytes)
-      ui128 = UInt128Ex.Parse(bits, 10)
+      ui128 = UInt256Ex.Parse(bits, 10)
       strbits = ui128.ToString(10)
 
       'Hex
@@ -202,7 +206,7 @@ Namespace TestUIntX
       Dim hex = "0123456789ABCDEF"
       bytes = TrimFirstSetOneZero(bytes)
       bits = String.Join("", bytes.[Select](Function(s) hex(s)))
-      ui128 = UInt128Ex.Parse(bits, 16)
+      ui128 = UInt256Ex.Parse(bits, 16)
       strbits = ui128.ToString(16)
     End Sub
 
@@ -210,92 +214,88 @@ Namespace TestUIntX
 
       'Complement
 
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim ui128 = New UInt128(hi, lo)
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim r = CULng(CULng(Rand.Next()) * Rand.Next())
-      ui128 += r
       instance += r
 
-      Dim result1 = Not ui128
       Dim result2 = Not instance
     End Sub
 
     Private Sub TestBitwiseAnd()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim ui128 = New UInt128(hi, lo)
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim number = CULng(CULng(Rand.Next()) * Rand.Next())
-      ui128 += number
       instance += number
 
       Dim r = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      ui128 = ui128 And r
       instance = instance And r
     End Sub
 
     Private Sub TestBitwiseOr()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim ui128 = New UInt128(hi, lo)
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim number = CULng(CULng(Rand.Next()) * Rand.Next())
-      ui128 += number
       instance += number
 
       Dim r = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      ui128 = ui128 Or r
       instance = instance Or r
     End Sub
 
     Private Sub TestBitwiseXor()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim ui128 = New UInt128(hi, lo)
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim number = CULng(CULng(Rand.Next()) * Rand.Next())
-      ui128 += number
       instance += number
 
       Dim r = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      ui128 = ui128 Xor r
       instance = instance Xor r
     End Sub
 
     Private Sub TestBitwiseShift()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim ui128 = New UInt128(hi, lo)
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim number = CULng(CULng(Rand.Next()) * Rand.Next())
-      ui128 += number
       instance += number
 
       Dim l = 1 + CInt(Double.Truncate(Math.Log10(Math.Pow(2, 128))))
       Dim r = Rand.[Next](0, l)
 
-      ui128 <<= r
       instance <<= r
 
 
       r = Rand.[Next](0, l)
 
-      ui128 >>= r
       instance >>= r
 
 
@@ -305,10 +305,13 @@ Namespace TestUIntX
     End Sub
 
     Private Sub TestIsZeroOne()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       If instance.IsZero Then instance += 1UI
 
@@ -316,7 +319,7 @@ Namespace TestUIntX
 
       If instance.IsMinusOne Then instance -= 1UI
 
-      instance = CType(0, UInt128Ex)
+      instance = CType(0, UInt256Ex)
       Dim bool_1 = instance.IsZero
 
       instance += 1UI
@@ -329,32 +332,37 @@ Namespace TestUIntX
 
     Private Sub TestIsMinMax()
 
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
-      If instance = UInt128Ex.MaxValue Then instance += 1UI
-      If instance = UInt128Ex.MinValue Then instance += 1UI
+      If instance = UInt256Ex.MaxValue Then instance += 1UI
+      If instance = UInt256Ex.MinValue Then instance += 1UI
 
-      instance = CType(0, UInt128Ex)
+      instance = CType(0, UInt256Ex)
       instance -= 1UI
 
-      If instance = UInt128Ex.MaxValue Then instance += 1UI
-      If instance = UInt128Ex.MinValue Then instance += 1UI
+      If instance = UInt256Ex.MaxValue Then instance += 1UI
+      If instance = UInt256Ex.MinValue Then instance += 1UI
     End Sub
 
     Private Sub TestEquals()
 
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance1 = New UInt128Ex(hi, lo)
-      Dim instance2 = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance1 = New UInt256Ex(rhi, rlo, lhi, llo)
+      Dim instance2 = New UInt256Ex(rhi, rlo, lhi, llo)
 
       If Not instance1.Equals(instance2) Then Throw New ArgumentException(Nothing)
 
-      Dim ainstance1 = New UInt128Ex() {CULng(CULng(Rand.Next()) * Rand.Next()), CULng(CULng(Rand.Next()) * Rand.Next()), CULng(CULng(Rand.Next()) * Rand.Next()), CULng(CULng(Rand.Next()) * Rand.Next())}
+      Dim ainstance1 = New UInt256Ex() {CULng(CULng(Rand.Next()) * Rand.Next()), CULng(CULng(Rand.Next()) * Rand.Next()), CULng(CULng(Rand.Next()) * Rand.Next()), CULng(CULng(Rand.Next()) * Rand.Next())}
 
       Dim ainstance2 = ainstance1.ToArray()
 
@@ -366,11 +374,14 @@ Namespace TestUIntX
     End Sub
 
     Private Sub TestGreatLessThan()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance1 = New UInt128Ex(hi, lo)
-      Dim instance2 = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance1 = New UInt256Ex(rhi, rlo, lhi, llo)
+      Dim instance2 = New UInt256Ex(rhi, rlo, lhi, llo)
 
       If Not instance1 = instance2 Then Throw New ArgumentException(Nothing)
 
@@ -403,13 +414,13 @@ Namespace TestUIntX
         Throw New ArgumentException(Nothing)
       End If
 
-      instance1 += CType(10, UInt128Ex)
+      instance1 += CType(10, UInt256Ex)
       If instance1 > instance2 Then
       Else
         Throw New ArgumentException(Nothing)
       End If
 
-      instance1 -= CType(20, UInt128Ex)
+      instance1 -= CType(20, UInt256Ex)
       If instance1 < instance2 Then
       Else
         Throw New ArgumentException(Nothing)
@@ -417,50 +428,60 @@ Namespace TestUIntX
     End Sub
 
     Private Sub TestIteration()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex()
+      Dim instance = New UInt256Ex()
 
       instance += 1UI
       instance -= 1UI
     End Sub
 
     Private Sub TestAddition()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim r = CULng(CULng(Rand.Next()) * Rand.Next())
       instance += r
     End Sub
 
     Private Sub TestSubtraction()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
       Dim r = CULng(CULng(Rand.Next()) * Rand.Next())
 
       instance -= r
     End Sub
 
     Private Sub TestMultiplication()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim r = CULng(CULng(Rand.Next()) * Rand.Next())
       instance *= r
     End Sub
 
     Private Sub TestDivision()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim r = CULng(Rand.NextInt64())
       instance /= r
@@ -468,41 +489,50 @@ Namespace TestUIntX
     End Sub
 
     Private Sub TestModulo()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim r = CULng(Rand.NextInt64())
       instance = instance Mod r
     End Sub
 
     Private Sub TestPow()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex()
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       Dim e = Rand.[Next](0, 15)
-      instance = UInt128Ex.Pow(instance, e)
+      instance = UInt256Ex.Pow(instance, e)
 
       e = Rand.[Next](0, 128)
       Dim overflow As Boolean
-      Dim p2 = UInt128Ex.PowerOfTwo(e, overflow)
+      Dim p2 = UInt256Ex.PowerOfTwo(e, overflow)
       If overflow Then Throw New ArgumentException(Nothing)
 
-      If Not UInt128Ex.IsPowerTwo(p2) Then Throw New ArgumentException(Nothing)
+      If Not UInt256Ex.IsPowerTwo(p2) Then Throw New ArgumentException(Nothing)
 
       e = Rand.[Next](0, 39)
-      Dim p10 = UInt128Ex.PowerOfTwo(e, overflow)
+      Dim p10 = UInt256Ex.PowerOfTwo(e, overflow)
       If overflow Then Throw New ArgumentException(Nothing)
     End Sub
 
     Private Sub TestNegate()
-      Dim lo = CULng(CULng(Rand.Next()) * Rand.Next())
-      Dim hi = CULng(CULng(Rand.Next()) * Rand.Next())
 
-      Dim instance = New UInt128Ex(hi, lo)
+      Dim llo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim lhi = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rlo = CULng(CULng(Rand.Next()) * Rand.Next())
+      Dim rhi = CULng(CULng(Rand.Next()) * Rand.Next())
+
+      Dim instance = New UInt256Ex(rhi, rlo, lhi, llo)
 
       instance = -instance
     End Sub
