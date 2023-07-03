@@ -132,18 +132,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     return result;
   }
 
-  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-  //public static ulong[] BitwiseAnd(ulong[] left, in ulong right, in int typesize)
-  //{
-  //  var result = new ulong[typesize];
-  //  if (left.SequenceEqual(result)) return result;
-
-  //  result[0] = left[0] & right;
-  //  for (var i = 1; i < typesize; i++)
-  //    result[i] = left[i] & 0u;
-  //  return result;
-  //}
-
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static ulong[] BitwiseAnd(ulong[] left, in ulong[] right, in int typesize)
   {
@@ -173,51 +161,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     return result;
   }
 
-  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-  //public static byte[] TwosComplement(byte[] value)
-  //{
-  //  var length = value.Length;
-  //  var result = new byte[length];
-
-  //  var carry = 1U;
-  //  for (var i = 0; i < length; i++)
-  //  {
-  //    var digit = (byte)~value[i] + carry;
-  //    result[i] = (byte)digit;
-  //    carry = digit >> 8;
-  //  }
-  //  if (carry != 0)
-  //  {
-  //    result = new byte[length + 1];
-  //    result[length] = 1;
-  //  }
-
-  //  return result;
-  //}
-
-  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-  //public static uint[] TwosComplement(uint[] value)
-  //{
-  //  var length = value.Length;
-  //  var result = new uint[length];
-
-  //  var carry = 1ul;
-  //  for (var i = 0; i < length; i++)
-  //  {
-  //    var digit = ~value[i] + carry;
-  //    result[i] = (uint)digit;
-  //    carry = digit >> 32;
-  //  }
-  //  if (carry != 0)
-  //  {
-  //    result = new uint[length + 1];
-  //    result[length] = 1;
-  //  }
-
-  //  return result;
-  //}
-
-
   #endregion
 
   #endregion
@@ -232,27 +175,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int256Ex operator checked -(Int256Ex value) => checked(Zero - value);
-
-  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-  //public static ulong[] TwosComplement(ulong[] value)
-  //{
-  //  UInt128Ex c = 1ul, d;
-  //  var length = value.Length;
-  //  var result = new ulong[length];
-  //  for (var i = 0; i < length; i++)
-  //  {
-  //    d = ~value[i] + c;
-  //    result[i] = (ulong)d;
-  //    c = d >> 64;
-  //  }
-  //  if (c != 0)
-  //  {
-  //    result = new ulong[length + 1];
-  //    result[length] = 1;
-  //  }
-  //  return result;
-  //}
-
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static ulong[] TwosComplement(ulong[] value)
@@ -439,21 +361,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     }
     if (r != 0) over_flow = true;
       return result;
-  }
-
-  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-  //private static uint[] Addition(in uint[] left, in uint[] right, in int size)
-  //{
-  //  uint r = 0U;
-  //  var rshift = (8 * size) - 1;
-  //  var result = new uint[size];
-  //  for (var i = 0; i < size; i++)
-  //  {
-  //    result[i] = left[i] + right[i] + r;
-  //    r = ((left[i] & right[i]) | ((left[i] | right[i]) & (~result[i]))) >> rshift;
-  //  }
-  //  return result;
-  //}
+  } 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] Subtract(in uint[] left, in uint[] right, in int size, out bool over_flow)
@@ -469,21 +377,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     }
     if (r != 0) over_flow = true;
       return result;
-  }
-
-  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-  //private static uint[] Subtract(in uint[] left, in uint[] right, in int size)
-  //{
-  //  var r = 0U;
-  //  var rshift = (8 * size) - 1;
-  //  var result = new uint[size];
-  //  for (var i = 0; i < size; i++)
-  //  {
-  //    result[i] = left[i] - right[i] - r;
-  //    r = (((~left[i]) & right[i]) | (~(left[i] ^ right[i])) & result[i]) >> rshift;
-  //  }
-  //  return result;
-  //}
+  } 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] Multiplication(in uint[] left, in uint[] right, int typesize, out bool over_flow)
@@ -1482,33 +1376,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     throw new NotImplementedException();
   }
 
-
-  //public static explicit operator byte(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator ushort(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator uint(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator ulong(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator char(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator sbyte(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator short(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator int(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator long(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator double(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator decimal(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator float(Int256Ex value) => throw new NotImplementedException();
-
-  //public static explicit operator checked byte(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked ushort(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked uint(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked ulong(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked char(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked sbyte(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked short(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked int(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked long(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked double(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked decimal(Int256Ex value) => throw new NotImplementedException();
-  //public static explicit operator checked float(Int256Ex value) => throw new NotImplementedException();
-
   #endregion
 
   #region Conversion to Methodes
@@ -1579,13 +1446,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     var uints = new uint[TypeSize / 4];
     Buffer.BlockCopy(bytes, 0, uints, 0, bytes.Length);
     return ToInt256Ex(TwosComplement(uints));
-
-    //var bytes = new byte[TypeSize];
-    //Array.Copy(tmp, bytes, TypeSize);
-
-    //var result = new ulong[TypeSize / 8];
-    //Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    //return new Int256Ex(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1604,13 +1464,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     Array.Reverse(tmp);
     Array.Resize(ref tmp, length);
     return ToInt256Ex(tmp);
-
-    //var bytes = new byte[TypeSize];
-    //Array.Copy(tmp, bytes, TypeSize);
-
-    //var result = new ulong[TypeSize / 8];
-    //Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    //return new Int256Ex(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1629,13 +1482,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     Array.Reverse(tmp);
     Array.Resize(ref tmp, TypeSize);
     return ToInt256Ex(tmp);
-
-    //var bytes = new byte[TypeSize];
-    //Array.Copy(tmp, bytes, TypeSize);
-
-    //var result = new ulong[TypeSize / 8];
-    //Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    //return new Int256Ex(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1659,13 +1505,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     Array.Reverse(tmp);
     Array.Resize(ref tmp, TypeSize);
     return ToInt256Ex(tmp);
-
-    //bytes = new byte[TypeSize];
-    //Array.Copy(tmp, bytes, TypeSize);
-
-    //var result = new ulong[TypeSize / 8];
-    //Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    //return new Int256Ex(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
