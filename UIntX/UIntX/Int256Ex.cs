@@ -135,18 +135,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     return result;
   }
 
-  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-  //public static ulong[] BitwiseAnd(ulong[] left, in ulong right, in int typesize)
-  //{
-  //  var result = new ulong[typesize];
-  //  if (left.SequenceEqual(result)) return result;
-
-  //  result[0] = left[0] & right;
-  //  for (var i = 1; i < typesize; i++)
-  //    result[i] = left[i] & 0u;
-  //  return result;
-  //}
-
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static ulong[] BitwiseAnd(ulong[] left, in ulong[] right, in int typesize)
   {
