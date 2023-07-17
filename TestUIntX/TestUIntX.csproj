@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="UInt512Ex\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\UIntX\UIntX.csproj" />
   </ItemGroup>
 

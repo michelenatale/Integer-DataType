@@ -14,6 +14,8 @@ public class Program
     TestInt256Ex.Start();
     TestUInt256Ex.Start();
 
+    TestInt512Ex.Start();
+    TestUInt512Ex.Start();
 
     Console.WriteLine();
     Console.WriteLine("FINISH");

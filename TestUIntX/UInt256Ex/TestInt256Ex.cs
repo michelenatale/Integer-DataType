@@ -669,7 +669,7 @@ public class TestInt256Ex
       throw new ArgumentException(null);
 
     e = Rand.Next(0, 39);
-    var p10 = Int256Ex.PowerOfTwo(e, out overflow);
+    var p10 = Int256Ex.PowerOfTen(e, out overflow);
     if (overflow) throw new ArgumentException(null);
   }
 

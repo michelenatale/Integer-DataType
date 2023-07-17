@@ -602,7 +602,7 @@ public class TestInt128Ex
       throw new ArgumentException(null);
 
     e = Rand.Next(0, 39);
-    var p10 = Int128Ex.PowerOfTwo(e, out overflow);
+    var p10 = Int128Ex.PowerOfTen(e, out overflow);
     if (overflow) throw new ArgumentException(null);
   }
 

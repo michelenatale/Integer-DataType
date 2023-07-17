@@ -521,7 +521,7 @@ Namespace TestUIntX
       If Not UInt256Ex.IsPowerTwo(p2) Then Throw New ArgumentException(Nothing)
 
       e = Rand.[Next](0, 39)
-      Dim p10 = UInt256Ex.PowerOfTwo(e, overflow)
+      Dim p10 = UInt256Ex.PowerOfTen(e, overflow)
       If overflow Then Throw New ArgumentException(Nothing)
     End Sub
 

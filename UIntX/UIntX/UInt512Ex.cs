@@ -1,68 +1,79 @@
 ﻿
+
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices; 
+using System.Runtime.CompilerServices;
 
 namespace michele.natale.Numbers;
 
 /// <summary>
-/// Represends a 256-Bit unsigned integer
+/// Represends a 512-Bit unsigned integer
 /// </summary>
 /// <remarks>Created by © Michele Natale</remarks>
 [StructLayout(LayoutKind.Explicit)]
-public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
+public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
 {
 
   #region Variables
 
-
   [FieldOffset(0)]
-  private readonly ulong LLO = 0;
+  private readonly ulong V0 = 0;
 
   [FieldOffset(8)]
-  private readonly ulong LHI = 0;
+  private readonly ulong V1 = 0;
 
   [FieldOffset(16)]
-  private readonly ulong RLO = 0;
+  private readonly ulong V2 = 0;
 
   [FieldOffset(24)]
-  private readonly ulong RHI = 0;
+  private readonly ulong V3 = 0;
+
+  [FieldOffset(32)]
+  private readonly ulong V4 = 0;
+
+  [FieldOffset(40)]
+  private readonly ulong V5 = 0;
+
+  [FieldOffset(48)]
+  private readonly ulong V6 = 0;
+
+  [FieldOffset(56)]
+  private readonly ulong V7 = 0;
 
   /// <summary>
   /// Current TypeSize of this Datatype
   /// </summary>
-  public const int TypeSize = 32;
-
-  public static UInt256Ex MaxValue => new(-1);
-
-  public static UInt256Ex MinValue => new();
+  public const int TypeSize = 64;
+ 
+  public static UInt512Ex MinValue =>  new();
+ 
+  public static UInt512Ex MaxValue =>  new(-1);
 
   public bool IsZero
   {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    get => (this.RHI | this.RLO | this.LHI | this.LLO) == 0;
+    get => (this.V0 | this.V1 | this.V2 | this.V3 | this.V4 | this.V5 | this.V6 | this.V7) == 0;
   }
 
   public bool IsOne
   {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    get => (this.RHI | this.RLO | this.LHI | this.LLO ^ 1) == 0;
+    get => (this.V0 ^ 1 | this.V1 | this.V2 | this.V3 | this.V4 | this.V5 | this.V6 | this.V7) == 0;
   }
 
   public bool IsMinusOne
   {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    get => this.RHI == ulong.MaxValue && this.RLO == ulong.MaxValue &&
-           this.LHI == ulong.MaxValue && this.LLO == ulong.MaxValue;
-  }
+    get => this.V0 == ulong.MaxValue && this.V1 == ulong.MaxValue && this.V2 == ulong.MaxValue && this.V3 == ulong.MaxValue &&
+           this.V4 == ulong.MaxValue && this.V5 == ulong.MaxValue && this.V6 == ulong.MaxValue && this.V7 == ulong.MaxValue;
+  } 
 
   /// <summary>One = 1</summary> 
   public readonly static UInt256Ex One = new(1);
 
   /// <summary>Zero = 0</summary> 
   public readonly static UInt256Ex Zero = new();
-
   #endregion
 
   #region Constructors
@@ -73,49 +84,57 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   /// <param name="number"></param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt256Ex()
+  public UInt512Ex()
   {
-    this.LLO = this.LHI = 0ul;
-    this.RLO = this.RHI = 0ul;
+    this.V0 = this.V1 = this.V2 = this.V3 = 0ul;
+    this.V4 = this.V5 = this.V6 = this.V7 = 0ul;
   }
 
   /// <summary>
   /// Constructor - copy values.
   /// </summary>
-  /// <param name="llo">Low low value bits</param>
+  /// <param name="lo">Low low value bits</param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt256Ex(long llo)
+  public UInt512Ex(long lo)
   {
-    this.LLO = (ulong)llo;
-    this.LHI = this.RLO = this.RHI = (ulong)(llo >> 63);
+    this.V0 = (ulong)lo;
+    this.V1 = this.V2 = this.V3 = (ulong)(lo >> 63);
+    this.V4 = this.V5 = this.V6 = this.V7 = (ulong)(lo >> 63);
   }
 
   /// <summary>
   /// Constructor - copy values.
   /// </summary>
-  /// <param name="llo">Low low value bits</param>
+  /// <param name="lo">low value bits</param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt256Ex(ulong llo)
+  public UInt512Ex(ulong lo)
   {
-    this.LLO = llo;
-    this.LHI = this.RLO = this.RHI = 0ul;
+    this.V0 = lo;
+    this.V1 = this.V2 = this.V3 = 0;
+    this.V4 = this.V5 = this.V6 = this.V7 = 0;
   }
 
   /// <summary>
-  /// Constructor - copy values
+  /// Constructor - copy values. 
   /// </summary>
-  /// <param name="rhi">High high value bits.</param>
-  /// <param name="rlo">High low value bits.</param>
-  /// <param name="lhi">Low high value bits.</param>
-  /// <param name="llo">Low low value bits.</param>
+  /// <param name="v0">Bits level 0</param>
+  /// <param name="v1">Bits level 64</param>
+  /// <param name="v2">Bits level 128</param>
+  /// <param name="v3">Bits level 192</param>
+  /// <param name="v4">Bits level 256</param>
+  /// <param name="v5">Bits level 320</param>
+  /// <param name="v6">Bits level 384</param>
+  /// <param name="v7">Bits level 448</param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt256Ex(ulong rhi, ulong rlo, ulong lhi, ulong llo)
+  public UInt512Ex(
+    ulong v7, ulong v6, ulong v5, ulong v4,
+    ulong v3, ulong v2, ulong v1, ulong v0)
   {
-    this.LLO = llo; this.LHI = lhi;
-    this.RLO = rlo; this.RHI = rhi;
+    this.V0 = v0; this.V1 = v1; this.V2 = v2; this.V3 = v3;
+    this.V4 = v4; this.V5 = v5; this.V6 = v6; this.V7 = v7;
   }
 
   /// <summary>
@@ -125,16 +144,16 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   /// <param name="islittleendian">True, if is little endian, otherwise false.</param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt256Ex(ReadOnlySpan<ulong> lohis, bool islittleendian = true)
+  public UInt512Ex(ReadOnlySpan<ulong> lohis, bool islittleendian = true)
   {
     if (islittleendian)
     {
-      this.LLO = lohis[0]; this.LHI = lohis[1];
-      this.RLO = lohis[2]; this.RHI = lohis[3];
+      this.V0 = lohis[0]; this.V1 = lohis[1]; this.V2 = lohis[2]; this.V3 = lohis[3];
+      this.V4 = lohis[4]; this.V5 = lohis[5]; this.V6 = lohis[6]; this.V7 = lohis[7];
       return;
     }
-    this.LLO = lohis[3]; this.LHI = lohis[2];
-    this.RLO = lohis[1]; this.RHI = lohis[0];
+    this.V0 = lohis[7]; this.V1 = lohis[6]; this.V2 = lohis[5]; this.V3 = lohis[4];
+    this.V4 = lohis[3]; this.V5 = lohis[2]; this.V6 = lohis[1]; this.V7 = lohis[0];
   }
 
   /// <summary>
@@ -143,10 +162,10 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   /// <param name="number">UInt256Ex instance</param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt256Ex(in UInt256Ex number)
+  public UInt512Ex(in UInt512Ex number)
   {
-    this.LLO = number.LLO; this.LHI = number.LHI;
-    this.RLO = number.RLO; this.RHI = number.RHI;
+    this.V0 = number.V0; this.V1 = number.V1; this.V2 = number.V2; this.V3 = number.V3;
+    this.V4 = number.V4; this.V5 = number.V5; this.V6 = number.V6; this.V7 = number.V7;
   }
 
   /// <summary>
@@ -155,13 +174,13 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   /// <param name="values"></param>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private UInt256Ex(uint[] values)
+  private UInt512Ex(uint[] values)
   {
     var result = new ulong[TypeSize / 8];
     var length = Math.Min(values.Length, TypeSize / 4);
     Buffer.BlockCopy(values, 0, result, 0, length * 4);
-    this.LLO = result[0]; this.LHI = result[1];
-    this.RLO = result[2]; this.RHI = result[3];
+    this.V0 = result[0]; this.V1 = result[1]; this.V2 = result[2]; this.V3 = result[3];
+    this.V4 = result[4]; this.V5 = result[5]; this.V6 = result[6]; this.V7 = result[7];
   }
 
   #endregion
@@ -171,13 +190,11 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   #region Bitwise
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator ~(UInt256Ex value)
-  {
-    return new(BitwiseNotUI(value.ToUInts()));
-  }
+  public static UInt512Ex operator ~(UInt512Ex value) =>
+    new(BitwiseNotUI(value.ToUInts()));
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator &(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator &(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
@@ -185,7 +202,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator |(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator |(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
@@ -193,13 +210,12 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator ^(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator ^(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
     return new(BitwiseXor(uil, uir, TypeSize / 4));
   }
-
 
   #region Internal Methodes
 
@@ -211,7 +227,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     if (value.SequenceEqual(one)) return mv;
     one[0] = 1;
     if (value.SequenceEqual(mv)) return new uint[value.Length];
-    var result = Subtract(mv, value, value.Length);
+    var result = Subtract(mv, value, value.Length,out _);
     return result;
   }
 
@@ -248,25 +264,29 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
   #region Unary
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator +(UInt256Ex value) => new(value);
+  public static UInt512Ex operator +(UInt512Ex value)
+  {
+    return value;//copy
+  }
+
+  public static UInt512Ex operator -(UInt512Ex value)
+  {
+    //return Negate(value);
+    return new( NegateUnsigned(value.ToUInts(), TypeSize / 4));
+  }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator -(UInt256Ex value) => 
-    new (NegateUnsigned(value.ToValues(), TypeSize / 8));
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static ulong[] NegateUnsigned(in ulong[] value, in int size)
+  public static uint[] NegateUnsigned(in uint[] value, in int size)
   {
     //=> MaxValue - ui + One;
-    var r = 1ul;
-    var result = new ulong[size];
+    var r = 1U;
+    var result = new uint[size];
     if (result.SequenceEqual(value))
       return value.ToArray();
 
-    result[0] = (ulong)-((UInt128Ex)value[0]);
+    result[0] = (uint)-value[0];
     for (var i = 1; i < size; i++)
-      result[i] = (ulong)-(r + (UInt128Ex)value[i]);
+      result[i] = (uint)-(r + value[i]);
     return result;
   }
 
@@ -275,26 +295,23 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   #region In- Decrement
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator ++(UInt256Ex value)
-  {
-    return value + 1;
-  }
+  public static UInt512Ex operator ++(UInt512Ex value) => value + 1;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator --(UInt256Ex value)
-  {
-    return value - 1;
-  }
+  public static UInt512Ex operator --(UInt512Ex value) => value - 1;
+
+
+  //checked
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator checked ++(UInt256Ex value)
+  public static UInt512Ex operator checked ++(UInt512Ex value)
   {
     if (value != MaxValue) return value + 1;
     throw new OverflowException($"++.Checked");
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator checked --(UInt256Ex value)
+  public static UInt512Ex operator checked --(UInt512Ex value)
   {
     if (value != MinValue) return value - 1;
     throw new OverflowException($"--.Checked");
@@ -305,23 +322,23 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   #region Numeric Operators
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator +(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator +(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    return new(Addition(uil, uir, TypeSize / 4));
+    return new(Addition(uil, uir, TypeSize / 4, out _));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator -(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator -(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    return new(Subtract(uil, uir, TypeSize / 4));
+    return new(Subtract(uil, uir, TypeSize / 4, out _));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator *(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator *(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
@@ -329,7 +346,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator /(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator /(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
@@ -337,7 +354,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator %(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator %(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
@@ -345,26 +362,29 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     return new(remainder);
   }
 
-  //Checked
-
+  //checked
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator checked +(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator checked +(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    return new(AdditionChecked(uil, uir, TypeSize / 4));
+    var result = new UInt512Ex(Addition(uil, uir, TypeSize / 4,out var isoverflow));
+    if (!isoverflow) return result;
+    throw new OverflowException($"{nameof(Addition)}.Checked");
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator checked -(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator checked -(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    return new(SubtractChecked(uil, uir, TypeSize / 4));
+    var result = new UInt512Ex(Subtract(uil, uir, TypeSize / 4, out var isoverflow));
+    if (!isoverflow) return result;
+    throw new OverflowException($"{nameof(Subtract)}.Checked");
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator checked *(UInt256Ex left, UInt256Ex right)
+  public static UInt512Ex operator checked *(UInt512Ex left, UInt512Ex right)
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
@@ -374,17 +394,15 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator checked /(UInt256Ex left, UInt256Ex right)
-  {
-    return left / right;
-  }
+  public static UInt512Ex operator checked /(UInt512Ex left, UInt512Ex right) => left / right;
 
   #region Internal Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] AdditionChecked(in uint[] left, in uint[] right, in int size)
+  private static uint[] Addition(in uint[] left, in uint[] right, in int size, out bool isoverflow)
   {
     uint r = 0U;
+    isoverflow = false;
     var rshift = (8 * size) - 1;
     var result = new uint[size];
     for (var i = 0; i < size; i++)
@@ -392,30 +410,16 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       result[i] = left[i] + right[i] + r;
       r = ((left[i] & right[i]) | ((left[i] | right[i]) & (~result[i]))) >> rshift;
     }
-    if (r == 0)
-      return result;
-
-    throw new OverflowException(nameof(AdditionChecked));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] Addition(in uint[] left, in uint[] right, in int size)
-  {
-    uint r = 0U;
-    var rshift = (8 * size) - 1;
-    var result = new uint[size];
-    for (var i = 0; i < size; i++)
-    {
-      result[i] = left[i] + right[i] + r;
-      r = ((left[i] & right[i]) | ((left[i] | right[i]) & (~result[i]))) >> rshift;
-    }
+    if (r != 0)
+      isoverflow = true;
     return result;
-  }
+  } 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] SubtractChecked(in uint[] left, in uint[] right, in int size)
+  private static uint[] Subtract(in uint[] left, in uint[] right, in int size, out bool isoverflow)
   {
     var r = 0U;
+    isoverflow = false;
     var rshift = (8 * size) - 1;
     var result = new uint[size];
     for (var i = 0; i < size; i++)
@@ -423,24 +427,10 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       result[i] = left[i] - right[i] - r;
       r = (((~left[i]) & right[i]) | (~(left[i] ^ right[i])) & result[i]) >> rshift;
     }
-    if (r == 0)
-      return result;
-    throw new OverflowException(nameof(SubtractChecked));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] Subtract(in uint[] left, in uint[] right, in int size)
-  {
-    var r = 0U;
-    var rshift = (8 * size) - 1;
-    var result = new uint[size];
-    for (var i = 0; i < size; i++)
-    {
-      result[i] = left[i] - right[i] - r;
-      r = (((~left[i]) & right[i]) | (~(left[i] ^ right[i])) & result[i]) >> rshift;
-    }
-    return result;
-  }
+    if (r != 0)
+      isoverflow = true;
+      return result; 
+  } 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] Multiplication(in uint[] left, in uint[] right, int typesize, out bool over_flow)
@@ -513,8 +503,8 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       result = LeftShift(result, 1, typesize);
       if (GreaterThenEqualLE(l, r, typesize))
       {
-        l = Subtract(l, r, typesize);
-        result = Addition(result, one, typesize); // result.Lo |= 1;
+        l = Subtract(l, r, typesize,out _);
+        result = Addition(result, one, typesize,out _); // result.Lo |= 1;
       }
       r = RightShift(r, 1, typesize);
     }
@@ -545,45 +535,37 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     return result;
   }
 
+  #endregion
+
+  #endregion
+
+  #region Shift Operators
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static bool LessThenEqualLE(in uint[] left, in uint[] right, in int size)
+  public static UInt512Ex operator <<(UInt512Ex value, int shiftamount)
   {
-    if (left.SequenceEqual(right)) return true;
-    if (LessThenLE(left, right, size)) return true;
-    return false;
+    var shift = shiftamount &= 0x1FF;
+    if (shift == 0) return value;
+    if (shiftamount < 0) return value >> shiftamount;
+    return new(LeftShift(value.ToUInts(), shift, TypeSize / 4));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static bool LessThenLE(in uint[] left, in uint[] right, in int size)
+  public static UInt512Ex operator >>(UInt512Ex value, int shiftamount)
   {
-    for (var i = 0; i < size; i++)
-    {
-      if (left[size - i - 1] < right[size - i - 1]) return true;
-      if (size - i - 1 == 0) continue;
-      if (left[size - i - 1] != right[size - i - 1]) return false;
-    }
-    return false;
+    var shift = shiftamount &= 0x1FF;
+    if (shift == 0) return value;
+    if (shiftamount < 0) return value << shiftamount;
+    return new(RightShift(value.ToUInts(), shift, TypeSize / 4));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static bool GreaterThenEqualLE(in uint[] left, in uint[] right, in int size)
+  public static UInt512Ex operator >>>(UInt512Ex value, int shiftamount)
   {
-    if (left.SequenceEqual(right)) return true;
-    if (GreaterThenLE(left, right, size)) return true;
-    return false;
+    return value >> shiftamount;
   }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static bool GreaterThenLE(in uint[] left, in uint[] right, in int size)
-  {
-    for (var i = 0; i < size; i++)
-    {
-      if (left[size - i - 1] > right[size - i - 1]) return true;
-      if (size - i - 1 == 0) continue;
-      if (left[size - i - 1] != right[size - i - 1]) return false;
-    }
-    return false;
-  }
+  #region Internal Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] LeftShift(in uint[] value, in int shiftl, in int typesize)
@@ -639,75 +621,31 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
   #endregion
 
-  #region Shift Operators
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator <<(UInt256Ex value, int shiftamount)
-  {
-    var shift = shiftamount &= 0xFF;
-    if (shift == 0) return value;
-    if (shiftamount < 0) return value >> shiftamount;
-    return new(LeftShift(value.ToUInts(), shift, TypeSize / 4));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator >>(UInt256Ex value, int shiftamount)
-  {
-    var shift = shiftamount &= 0xFF;
-    if (shift == 0) return value;
-    if (shiftamount < 0) return value << shiftamount;
-    return new(RightShift(value.ToUInts(), shift, TypeSize / 4));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator >>>(UInt256Ex value, int shiftamount)
-  {
-    return value >> shiftamount;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] LeftShift(in UInt256Ex value, in int shiftl, in int typesize)
-  {
-    var uints = value.ToUInts();
-    return LeftShift(uints, shiftl, typesize);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] RightShift(in UInt256Ex value, in int shiftl, in int typesize)
-  {
-    var uints = value.ToUInts();
-    return RightShift(uints, shiftl, typesize);
-  }
-
-  #endregion
-
   #region Equality Operators
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public override bool Equals([NotNullWhen(true)] object? obj)
   {
-    if (typeof(UInt256Ex) == obj!.GetType())
-      return this.Equals((UInt256Ex)obj);
+    if (typeof(UInt512Ex) == obj!.GetType())
+      return this.Equals((UInt512Ex)obj);
     return false;
   }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public bool Equals(UInt256Ex other)
-  {
-    return this == other;
-  }
 
-  public static bool operator ==(UInt256Ex left, UInt256Ex right)
+  public bool Equals(UInt512Ex other) => this == other;
+  public static bool operator ==(UInt512Ex left, UInt512Ex right)
   {
-    if (left.LLO != right.LLO) return false;
-    if (left.LHI != right.LHI) return false;
-    if (left.RLO != right.RLO) return false;
-    if (left.RHI != right.RHI) return false;
+    if (left.V0 != right.V0) return false;
+    if (left.V1 != right.V1) return false;
+    if (left.V2 != right.V2) return false;
+    if (left.V3 != right.V3) return false;
+    if (left.V4 != right.V4) return false;
+    if (left.V5 != right.V5) return false;
+    if (left.V6 != right.V6) return false;
+    if (left.V7 != right.V7) return false;
     return true;
   }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool operator !=(UInt256Ex left, UInt256Ex right)
+  public static bool operator !=(UInt512Ex left, UInt512Ex right)
   {
     return !(left == right);
   }
@@ -717,28 +655,81 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   #region Comparison Operators
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool operator <(UInt256Ex left, UInt256Ex right)
+  public int CompareTo(object? value)
   {
-    return LessThenLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
+    if (value is UInt512Ex other) return this.CompareTo(other);
+    else if (value is null) return 1;
+    else throw new ArgumentException($"data type is incorrect", nameof(value));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool operator >(UInt256Ex left, UInt256Ex right)
+  public int CompareTo(UInt512Ex value)
   {
-    return GreaterThenLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
+    if (this < value) return -1;
+    else if (this > value) return 1;
+    else return 0;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool operator <=(UInt256Ex left, UInt256Ex right)
+  public static bool operator <(UInt512Ex left, UInt512Ex right) =>
+    LessThenLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static bool operator >(UInt512Ex left, UInt512Ex right) => 
+    GreaterThenLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
+    
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static bool operator <=(UInt512Ex left, UInt512Ex right) =>
+    LessThenEqualLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static bool operator >=(UInt512Ex left, UInt512Ex right) =>
+    GreaterThenEqualLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
+
+  #region Internal Methodes
+
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static bool LessThenEqualLE(in uint[] left, in uint[] right, in int size)
   {
-    return LessThenEqualLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
+    if (left.SequenceEqual(right)) return true;
+    if (LessThenLE(left, right, size)) return true;
+    return false;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool operator >=(UInt256Ex left, UInt256Ex right)
+  private static bool LessThenLE(in uint[] left, in uint[] right, in int size)
   {
-    return GreaterThenEqualLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
+    for (var i = 0; i < size; i++)
+    {
+      if (left[size - i - 1] < right[size - i - 1]) return true;
+      if (size - i - 1 == 0) continue;
+      if (left[size - i - 1] != right[size - i - 1]) return false;
+    }
+    return false;
   }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static bool GreaterThenEqualLE(in uint[] left, in uint[] right, in int size)
+  {
+    if (left.SequenceEqual(right)) return true;
+    if (GreaterThenLE(left, right, size)) return true;
+    return false;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static bool GreaterThenLE(in uint[] left, in uint[] right, in int size)
+  {
+    for (var i = 0; i < size; i++)
+    {
+      if (left[size - i - 1] > right[size - i - 1]) return true;
+      if (size - i - 1 == 0) continue;
+      if (left[size - i - 1] != right[size - i - 1]) return false;
+    }
+    return false;
+  }
+
+  #endregion
 
   #endregion
 
@@ -747,7 +738,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   #region Number Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex Pow(UInt256Ex value, int exp)
+  public static UInt512Ex Pow(UInt512Ex value, int exp)
   {
     var uints = value.ToUInts();
     var result = Pow(uints, exp, TypeSize / 4);
@@ -755,61 +746,46 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex PowerOfTwo(int exp, out bool overflow)
+  public static UInt512Ex PowerOfTwo(int exp, out bool overflow)
   {
     var uints = PowerOfTwo(exp, TypeSize / 4, out overflow);
-    if (overflow) return new UInt256Ex();
+    if (overflow) return new UInt512Ex();
     return new(uints);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex PowerOfTen(int exp, out bool overflow)
+  public static UInt512Ex PowerOfTen(int exp, out bool overflow)
   {
     var uints = PowerOfTen(exp, TypeSize / 4, out overflow);
-    if (overflow) return new UInt256Ex();
+    if (overflow) return new UInt512Ex();
     return new(uints);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool IsPowerTwo(UInt256Ex value) => PopCount(value) == 1u;
+  public static bool IsPowerTwo(UInt512Ex value) => PopCount(value) == 1u;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt256Ex Copy() => new(this.ToValues());
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex Abs(UInt256Ex value) => value;
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  internal static UInt256Ex PopCount(UInt256Ex value)
+  public UInt512Ex Copy()
   {
-    var uints = value.ToUInts();
-    var result = Zero;
-    for (var i = 0; i < uints.Length; i++)
-      result += ulong.PopCount(uints[i]);
+    return new(this);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static UInt512Ex Abs(UInt512Ex value) => value;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public byte[] ToBytes(bool littleendian = true)
+  {
+    var result = new byte[TypeSize];
+    Buffer.BlockCopy(this.ToValues(), 0, result, 0, TypeSize);
+    if (!littleendian) Array.Reverse(result);
     return result;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Span<byte> ToSpan(bool littleendian = true)
   {
-    return this.ToBytes(littleendian);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public ulong[] ToValues(bool littleendian = true)
-  {
-    if (littleendian) return new[] { this.LLO, this.LHI, this.RLO, this.RHI };
-    return new[] { this.RHI, this.RLO, this.LHI, this.LLO };
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public byte[] ToBytes(bool littleendian = true)
-  {
-    var lo_hi = this.ToValues();
-    var result = new byte[TypeSize];
-    Buffer.BlockCopy(lo_hi, 0, result, 0, TypeSize);
-    if (!littleendian) Array.Reverse(result);
-    return result;
+    return ToBytes(littleendian);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -818,6 +794,27 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     var result = new uint[TypeSize / 4];
     Buffer.BlockCopy(this.ToValues(), 0, result, 0, TypeSize);
     if (!littleendian) Array.Reverse(result);
+    return result;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public ulong[] ToValues(bool littleendian = true)
+  {
+    var result = new ulong[]
+    {
+      this.V0, this.V1, this.V2, this.V3, this.V4, this.V5, this.V6, this.V7
+    };
+    if (!littleendian) Array.Reverse(result);
+    return result;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  internal static UInt512Ex PopCount(UInt512Ex value)
+  {
+    var uints = value.ToUInts();
+    var result = Zero;
+    for (var i = 0; i < uints.Length; i++)
+      result += ulong.PopCount(uints[i]);
     return result;
   }
 
@@ -865,7 +862,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   private static uint[] PowerOfTen(int exp, int tsize, out bool overflow)
   {
     overflow = true;
-    var max = (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize * tsize)));
+    var max = (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize * tsize / 2)));
     if (exp > max) return new uint[tsize];
 
     overflow = false;
@@ -887,10 +884,14 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   #region Formating Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public override string ToString()
+  public override int GetHashCode()
   {
-    return this.ToString(10);
+    return (int)(this.V7 ^ (2ul * this.V6) ^ (3ul * this.V5) ^ (4ul * this.V4) ^
+                (5ul * this.V3) ^ (6ul * this.V2) ^ (7ul * this.V1) ^ (8ul * this.V0));
   }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public override string ToString() => this.ToString(10);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public readonly unsafe string ToString(int radix)
@@ -899,7 +900,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       throw new ArgumentOutOfRangeException(nameof(radix));
 
     ReadOnlySpan<byte> bytes;
-    var tmp = new ulong[] { this.LLO, this.LHI, this.RLO, this.RHI };
+    var tmp = new ulong[] { this.V0, this.V1, this.V2, this.V3, this.V4, this.V5, this.V6, this.V7 };
     fixed (ulong* ptr = tmp)
       bytes = new Span<byte>(ptr, 8 * tmp.Length).ToArray();
     bytes = TrimLastReverse(bytes.ToArray());
@@ -912,69 +913,6 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       16 => ToHexSystem(bytes),
       _ => throw new ArgumentOutOfRangeException(nameof(radix)),
     };
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex ToUInt256Ex(ReadOnlySpan<byte> bytes, bool littleendian = true)
-  {
-    if (bytes.Length > TypeSize)  
-      throw new ArgumentOutOfRangeException(nameof(bytes));
-
-    var bits = new byte[TypeSize];
-    Buffer.BlockCopy(bytes.ToArray(), 0, bits, 0, bytes.Length);
-    if (!littleendian) Array.Reverse(bits);
-
-    var result = new ulong[TypeSize / 8];
-    Buffer.BlockCopy(bits, 0, result, 0, TypeSize);
-    return new UInt256Ex(result);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex ToUInt256Ex(ReadOnlySpan<uint> uints, bool littleendian = true)
-  {
-    if (uints.Length > TypeSize / 4) throw new ArgumentOutOfRangeException(nameof(uints));
-
-    var bits = new uint[TypeSize / 4];
-    Buffer.BlockCopy(uints.ToArray(), 0, bits, 0, uints.Length * 4);
-    if (!littleendian) Array.Reverse(bits);
-
-    var result = new ulong[TypeSize / 8];
-    Buffer.BlockCopy(bits, 0, result, 0, TypeSize);
-    return new (result);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex ToUInt256Ex(ReadOnlySpan<ulong> ulongs, bool littleendian = true)
-  {
-    if (ulongs.Length > TypeSize / 8) throw new ArgumentOutOfRangeException(nameof(ulongs));
-
-    var bits = new ulong[TypeSize / 8];
-    Array.Copy(ulongs.ToArray(), bits, TypeSize / 8);
-    if (!littleendian) Array.Reverse(bits);
-
-    return new (bits);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public int CompareTo(object? value)
-  {
-    if (value is UInt256Ex other) return this.CompareTo(other);
-    else if (value is null) return 1;
-    else throw new ArgumentException($"data type is incorrect", nameof(value));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public int CompareTo(UInt256Ex value)
-  {
-    if (this < value) return -1;
-    else if (this > value) return 1;
-    else return 0;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly override int GetHashCode()
-  {
-    return (int)(this.RHI ^ (2ul * this.RLO) ^ (3ul * this.RLO) ^ (4ul * this.LLO));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1046,11 +984,434 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     return data.Take(length - count).Reverse().ToArray();
   }
 
+  public static UInt512Ex ToUInt512Ex(ReadOnlySpan<byte> bytes, bool littleendian = true)
+  {
+    if (bytes.Length > TypeSize) throw new ArgumentOutOfRangeException(nameof(bytes));
+
+    var bits = new byte[TypeSize];
+    Buffer.BlockCopy(bytes.ToArray(), 0, bits, 0, bytes.Length);
+    if (!littleendian) Array.Reverse(bits);
+
+    var result = new ulong[TypeSize / 8];
+    Buffer.BlockCopy(bits, 0, result, 0, TypeSize);
+    return new UInt512Ex(result);
+  }
+
+  public static UInt512Ex ToUInt512Ex(ReadOnlySpan<uint> uints, bool littleendian = true)
+  {
+    if (uints.Length > TypeSize / 4) throw new ArgumentOutOfRangeException(nameof(uints));
+
+    var bits = new uint[TypeSize / 4];
+    Buffer.BlockCopy(uints.ToArray(), 0, bits, 0, uints.Length * 4);
+    if (!littleendian) Array.Reverse(bits);
+
+    var result = new ulong[TypeSize / 8];
+    Buffer.BlockCopy(bits, 0, result, 0, TypeSize);
+    return new UInt512Ex(result);
+
+  }
+
+  public static UInt512Ex ToUInt512Ex(ReadOnlySpan<ulong> ulongs, bool littleendian = true)
+  {
+    if (ulongs.Length > TypeSize / 8) throw new ArgumentOutOfRangeException(nameof(ulongs));
+
+    var bits = new ulong[TypeSize / 8];
+    Array.Copy(ulongs.ToArray(), bits, TypeSize / 8);
+    if (!littleendian) Array.Reverse(bits);
+
+    return new UInt512Ex(bits);
+  }
+
   #endregion
 
   #region Conversion and Parse
 
-  #region Conversion to UInt256Ex
+  #region Conversion to UI512Ex
+
+  #region Implicit Conversion to UI512Ex
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static implicit operator UInt512Ex(byte value) => new(0, 0, 0, 0, 0, 0, 0, value);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static implicit operator UInt512Ex(char value) => new(0, 0, 0, 0, 0, 0, 0, value);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static implicit operator UInt512Ex(ushort value) => new(0, 0, 0, 0, 0, 0, 0, value);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static implicit operator UInt512Ex(uint value) => new(0, 0, 0, 0, 0, 0, 0, value);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static implicit operator UInt512Ex(ulong value) => new(0, 0, 0, 0, 0, 0, 0, value);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static implicit operator UInt512Ex(UInt128Ex value)
+  {
+    var v = value.ToValues();
+    return new(0, 0, 0, 0, 0, 0, v[1], v[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static implicit operator UInt512Ex(UInt256Ex value)
+  {
+    var v = value.ToValues();
+    return new(0, 0, 0, 0, v[3], v[2], v[1], v[0]);
+  }
+
+  #endregion
+
+  #region Explicit Conversion to UI512Ex
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(sbyte value)
+  {
+    return new(value);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(sbyte value)
+  {
+    if (value < 0) throw new OverflowException(nameof(value));
+    return new(value);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(short value)
+  {
+    return new(value);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(short value)
+  {
+    if (value < 0) throw new OverflowException(nameof(value));
+    return new(value);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(int value)
+  {
+    return new(value);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(int value)
+  {
+    if (value < 0) throw new OverflowException(nameof(value));
+    return new(value);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(long value)
+  {
+    return new(value);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(long value)
+  {
+    if (value < 0) throw new OverflowException(nameof(value));
+    return new(value);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(float value)
+  {
+    return (UInt512Ex)(double)value;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(float value)
+  {
+    if (value < 0) throw new OverflowException(nameof(value));
+    return (UInt512Ex)value;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(decimal value)
+  {
+    var ulongs = new ulong[8];
+    int[] bits = decimal.GetBits(decimal.Truncate(value));
+    var uints = new[] { (uint)bits[0], (uint)bits[1], (uint)bits[2], 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u };
+    Buffer.BlockCopy(uints, 0, ulongs, 0, TypeSize);
+
+    var result = new UInt512Ex(ulongs);
+    if (value >= 0) return result;
+    return -result;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(decimal value)
+  {
+    if (decimal.IsNegative(value)) throw new ArgumentOutOfRangeException(nameof(value));
+    return (UInt512Ex)value;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(double value)
+  {
+    if (double.IsInfinity(value) || double.IsNaN(value))
+      throw new OverflowException(nameof(value));
+
+    if (double.IsFinite(value))
+      return ToUInt512Ex(value);
+
+    throw new ArgumentOutOfRangeException(nameof(value));
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(double value)
+  {
+    const double pow_2_512 = 13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084096.0;
+ 
+    if (value < 0.0) throw new ArgumentOutOfRangeException(nameof(value));
+    if (double.IsInfinity(value)) throw new OverflowException(nameof(value));
+    if (value >= pow_2_512) throw new ArgumentOutOfRangeException(nameof(value));
+    if (double.IsNaN(value)) throw new OverflowException(nameof(value));
+
+    if (double.IsFinite(value))
+      return ToUInt512Ex(value);
+
+    throw new ArgumentOutOfRangeException(nameof(value));
+  }
+
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(Int128Ex value)
+  {
+    if (value.Sign == 0) return new();
+
+    var v = value.ToValues();
+    if (value.Sign == 1) return new(0, 0, 0, 0, 0, 0, v[1], v[0]);
+    return new(ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, v[1], v[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(Int128Ex value)
+  {
+    if (value.Sign == -1) throw new OverflowException(nameof(value));
+
+    return (UInt512Ex)value;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(Int256Ex value)
+  {
+    if (value.Sign == 0) return new();
+
+    ulong[] result;
+    var v = value.ToValues();
+    if (value.Sign >= 0)
+    {
+      result = new ulong[TypeSize / 8];
+      Array.Copy(v, result, v.Length);
+      return new(result);
+    }
+    result = Enumerable.Repeat(ulong.MaxValue, TypeSize / 8).ToArray();
+    Array.Copy(v, 0, result, 0, v.Length);
+    return new(result);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(Int256Ex value)
+  {
+    if (value.Sign == -1) throw new OverflowException(nameof(value));
+    return new(value.ToValues());
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator UInt512Ex(Int512Ex value)
+  {
+    var v = value.ToValues();
+    return new(v);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked UInt512Ex(Int512Ex value)
+  {
+    if (value.Sign == -1) throw new OverflowException(nameof(value));
+    var v = value.ToValues();
+    return new(v);
+  }
+
+  #region Internal Methodes
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static UInt512Ex ToUInt512Ex(double value)
+  {
+    UInt512Ex result;
+    bool negate = false;
+    if (value < 0)
+    {
+      negate = true;
+      value = -value;
+    }
+
+    if (value <= ulong.MaxValue)
+      result = new UInt512Ex(0, 0, 0, 0, 0, 0, 0,(ulong)value);
+    else
+    {
+      int shift = Math.Max((int)Math.Ceiling(Math.Log(value, 2)) - 63, 0);
+      result = new UInt512Ex(0, 0, 0, 0, 0, 0, 0, (ulong)(value / Math.Pow(2, shift)));
+      result <<= shift;
+    }
+
+    if (negate) result = -result;
+    return result;
+  }
+
+  #endregion
+
+  #endregion
+
+  #endregion
+
+  #region Conversion from UI512Ex
+
+  #region Implicit Conversion from UI512Ex
+  //No Implicit Conversion
+  #endregion
+
+  #region Explicit Conversion from UI512Ex
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator byte(UInt512Ex value) => (byte)value.V0;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator ushort(UInt512Ex value) =>  (ushort)value.V0;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator uint(UInt512Ex value) =>    (uint)value.V0;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator ulong(UInt512Ex value) =>   value.V0;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator char(UInt512Ex value) =>    (char)value.V0;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator sbyte(UInt512Ex value) =>   (sbyte)value.V0;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator short(UInt512Ex value) =>   (short)value.V0;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator int(UInt512Ex value) =>     (int)value.V0;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator long(UInt512Ex value) =>    (long)value.V0;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator double(UInt512Ex value)
+  {
+    double multiplier = ulong.MaxValue;
+    var result = (((((((((((((value.V7 * multiplier) + value.V6) * multiplier) + value.V5) * multiplier) + value.V4) 
+                 * multiplier) + value.V3) * multiplier) + value.V2) * multiplier) + value.V1) * multiplier) + value.V0;
+    return result;
+  }
+
+  public static explicit operator decimal(UInt512Ex value)
+  {
+    ulong lo64 = value.V0;
+    uint hi32 = (uint)value.V1;
+    return new decimal((int)lo64, (int)(lo64 >> 32), (int)hi32, isNegative: false, scale: 0);
+    //return new decimal((int)(value.V0 & 0xFFFFFFFF), (int)(value.V1 & 0xFFFFFFFF), (int)(value.V2 & 0xFFFFFFFF),isNegative: false, scale:0);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator float(UInt512Ex value) => (float)(double)value;
+
+  //checked
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked byte(UInt512Ex value)
+  {
+    if ((value.V7 | value.V6 | value.V5 | value.V4 | value.V3 | value.V2 | value.V1) == 0) return checked((byte)value.V0);
+    throw new OverflowException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked ushort(UInt512Ex value)
+  {
+    if ((value.V7 | value.V6 | value.V5 | value.V4 | value.V3 | value.V2 | value.V1) == 0) return checked((ushort)value.V0);
+    throw new OverflowException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked uint(UInt512Ex value)
+  {
+    if ((value.V7 | value.V6 | value.V5 | value.V4 | value.V3 | value.V2 | value.V1) == 0) return checked((uint)value.V0);
+    throw new OverflowException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked char(UInt512Ex value)
+  {
+    if ((value.V7 | value.V6 | value.V5 | value.V4 | value.V3 | value.V2 | value.V1) == 0) return checked((char)value.V0);
+    throw new OverflowException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked sbyte(UInt512Ex value)
+  {
+    if ((value.V7 | value.V6 | value.V5 | value.V4 | value.V3 | value.V2 | value.V1) == 0) return checked((sbyte)value.V0);
+    throw new OverflowException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked short(UInt512Ex value)
+  {
+    if ((value.V7 | value.V6 | value.V5 | value.V4 | value.V3 | value.V2 | value.V1) == 0) return checked((short)value.V0);
+    throw new OverflowException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked int(UInt512Ex value)
+  {
+    if ((value.V7 | value.V6 | value.V5 | value.V4 | value.V3 | value.V2 | value.V1) == 0) return checked((int)value.V0);
+    throw new OverflowException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked long(UInt512Ex value)
+  {
+    if ((value.V7 | value.V6 | value.V5 | value.V4 | value.V3 | value.V2 | value.V1) == 0) return checked((long)value.V0);
+    throw new OverflowException();
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked double(UInt512Ex value)
+  {
+    const double pow_2_512 = 13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084096.0;
+ 
+    double multiplier = ulong.MaxValue;
+    var result = (((((((((((((value.V7 * multiplier) + value.V6) * multiplier) + value.V5) * multiplier) + value.V4)
+                 * multiplier) + value.V3) * multiplier) + value.V2) * multiplier) + value.V1) * multiplier) + value.V0;
+    if (result < 0 || result >= pow_2_512)
+      throw new OverflowException(nameof(value));
+    return result;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked decimal(UInt512Ex value)
+  {
+    //if (value.V1 <= uint.MaxValue)
+    //  return new decimal((int)(value.V0 & 0xFFFFFFFF), (int)(value.V1 & 0xFFFFFFFF), (int)(value.V2 & 0xFFFFFFFF), isNegative: false, scale: 0);
+
+    if (value.V1 <= uint.MaxValue)
+    {
+      ulong lo64 = value.V0;
+      uint hi32 = (uint)value.V1;
+      return new decimal((int)lo64, (int)(lo64 >> 32), (int)hi32, isNegative: false, scale: 0);
+    }
+    throw new OverflowException(nameof(value));
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked float(UInt512Ex value) => checked((float)(double)value);
+
+  #endregion
 
   #region Conversion to Methodes
 
@@ -1075,7 +1436,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   public char ToChar(IFormatProvider? provider) => (char)this;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public DateTime ToDateTime(IFormatProvider? provider) => 
+  public DateTime ToDateTime(IFormatProvider? provider) =>
     Convert.ToDateTime(this.ToDecimal(provider), provider);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1110,402 +1471,13 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
   #endregion
 
-  #region Implicit Conversion to UInt256Ex
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator UInt256Ex(byte value) => new(0, 0, 0, value);
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator UInt256Ex(char value) => new(0, 0, 0, value);
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator UInt256Ex(ushort value) => new(0, 0, 0, value);
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator UInt256Ex(uint value) => new(0, 0, 0, value);
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator UInt256Ex(ulong value) => new(0, 0, 0, value);
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator UInt256Ex(UInt128Ex value)
-  {
-    var v = value.ToValues();
-    return new(0, 0, v[1], v[0]);
-  }
-
-  #endregion
-
-  #region Explicit Conversion to UInt256Ex
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator UInt256Ex(sbyte value)
-  {
-    return new(value);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked UInt256Ex(sbyte value)
-  {
-    if (value < 0) throw new OverflowException(nameof(value));
-    return new(value);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator UInt256Ex(short value)
-  {
-    return new(value);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked UInt256Ex(short value)
-  {
-    if (value < 0) throw new OverflowException(nameof(value));
-    return new(value);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator UInt256Ex(int value)
-  {
-    return new(value);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked UInt256Ex(int value)
-  {
-    if (value < 0) throw new OverflowException(nameof(value));
-    return new(value);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator UInt256Ex(long value)
-  {
-    return new(value);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked UInt256Ex(long value)
-  {
-    if (value < 0) throw new OverflowException(nameof(value));
-    return new(value);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator UInt256Ex(float value)
-  {
-    return (UInt256Ex)(double)value;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked UInt256Ex(float value)
-  {
-    if (value < 0) throw new OverflowException(nameof(value));
-    return (UInt256Ex)value;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator UInt256Ex(decimal value)
-  {
-    var ulongs = new ulong[4];
-    int[] bits = decimal.GetBits(decimal.Truncate(value));
-    var uints = new[] { (uint)bits[0], (uint)bits[1], (uint)bits[2], 0u, 0u, 0u, 0u, 0u };
-    Buffer.BlockCopy(uints, 0, ulongs, 0, TypeSize);
-
-    var result = new UInt256Ex(ulongs);
-    if (value >= 0) return result;
-    return -result;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked UInt256Ex(decimal value)
-  {
-    if (decimal.IsNegative(value)) throw new ArgumentOutOfRangeException(nameof(value));
-    return (UInt256Ex)value;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator UInt256Ex(double value)
-  {
-    if (double.IsInfinity(value) || double.IsNaN(value))
-      throw new OverflowException(nameof(value));
-
-    if (double.IsFinite(value))
-      return ToUInt256Ex(value);
-
-    throw new ArgumentOutOfRangeException(nameof(value));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked UInt256Ex(double value)
-  {
-    const double pow_2_256 = 115792089237316195423570985008687907853269984665640564039457584007913129639936.0;
-
-    if (value < 0.0) throw new ArgumentOutOfRangeException(nameof(value));
-    if (double.IsInfinity(value)) throw new OverflowException(nameof(value));
-    if (value >= pow_2_256) throw new ArgumentOutOfRangeException(nameof(value));
-    if (double.IsNaN(value)) throw new OverflowException(nameof(value));
-
-    if (double.IsFinite(value))
-      return ToUInt256Ex(value);
-
-    throw new ArgumentOutOfRangeException(nameof(value));
-  }
-
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator UInt256Ex(Int128Ex value)
-  {
-    if (value.Sign == 0) return new();
-
-    var v = value.ToValues();
-    if (value.Sign == 1) return new(0, 0, v[1], v[0]);
-    return new(ulong.MaxValue, ulong.MaxValue, v[1], v[0]);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked UInt256Ex(Int128Ex value)
-  {
-    if (value.Sign == -1) throw new OverflowException(nameof(value));
-
-    return (UInt256Ex)value;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator UInt256Ex(Int256Ex value)
-  {
-    return new(value.ToValues());
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked UInt256Ex(Int256Ex value)
-  {
-    if (value.Sign == -1) throw new OverflowException(nameof(value));
-    return new(value.ToValues());
-  }
-
-  #region Internal Methode
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static UInt256Ex ToUInt256Ex(double value)
-  {
-    UInt256Ex result;
-    bool negate = false;
-    if (value < 0)
-    {
-      negate = true;
-      value = -value;
-    }
-
-    if (value <= ulong.MaxValue)
-      result = new UInt256Ex(0, 0, 0, (ulong)value);
-    else
-    {
-      int shift = Math.Max((int)Math.Ceiling(Math.Log(value, 2)) - 63, 0);
-      result = new UInt256Ex(0, 0, 0, (ulong)(value / Math.Pow(2, shift)));
-      result <<= shift;
-    }
-
-    if (negate) result = -result;
-
-    return result;
-  }
-
-  #endregion
-
-  #endregion
-
-  #endregion
-
-  #region Conversion from UInt256Ex
-
-  #region Implicit Conversion from UInt256Ex
-  //No Implicit Conversion
-  #endregion
-
-  #region Explicit Conversion from UInt256Ex
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator byte(UInt256Ex value)
-  {
-    return (byte)value.LLO;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator ushort(UInt256Ex value)
-  {
-    return (ushort)value.LLO;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator uint(UInt256Ex value)
-  {
-    return (uint)value.LLO;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator ulong(UInt256Ex value)
-  {
-    return value.LLO;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator char(UInt256Ex value)
-  {
-    return (char)value.LLO;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator sbyte(UInt256Ex value)
-  {
-    return (sbyte)value.LLO;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator short(UInt256Ex value)
-  {
-    return (short)value.LLO;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator int(UInt256Ex value)
-  {
-    return (int)value.LLO;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator long(UInt256Ex value)
-  {
-    return (long)value.LLO;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator double(UInt256Ex value)
-  {
-    double multiplier = ulong.MaxValue;
-    var result = (((((value.RHI * multiplier) + value.RLO) * multiplier) + value.LHI) * multiplier) + value.LLO;
-    return result;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator decimal(UInt256Ex value)
-  {
-    ulong lo64 = value.LLO;
-    uint hi32 = (uint)value.LHI;
-    return new decimal((int)lo64, (int)(lo64 >> 32), (int)hi32, isNegative: false, scale: 0);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator float(UInt256Ex value)
-  {
-    return (float)(double)value;
-  }
-
-  //checked
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked byte(UInt256Ex value)
-  {
-    if ((value.RHI | value.RLO | value.LHI) == 0) return checked((byte)value.LLO);
-    throw new OverflowException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked ushort(UInt256Ex value)
-  {
-    if ((value.RHI | value.RLO | value.LHI) == 0) return checked((ushort)value.LLO);
-    throw new OverflowException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked uint(UInt256Ex value)
-  {
-    if ((value.RHI | value.RLO | value.LHI) == 0) return checked((uint)value.LLO);
-    throw new OverflowException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked ulong(UInt256Ex value)
-  {
-    if ((value.RHI | value.RLO | value.LHI) == 0) return checked((ulong)value.LLO);
-    throw new OverflowException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked char(UInt256Ex value)
-  {
-    if ((value.RHI | value.RLO | value.LHI) == 0) return checked((char)value.LLO);
-    throw new OverflowException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked sbyte(UInt256Ex value)
-  {
-    if ((value.RHI | value.RLO | value.LHI) == 0) return checked((sbyte)value.LLO);
-    throw new OverflowException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked short(UInt256Ex value)
-  {
-    if ((value.RHI | value.RLO | value.LHI) == 0) return checked((short)value.LLO);
-    throw new OverflowException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked int(UInt256Ex value)
-  {
-    if ((value.RHI | value.RLO | value.LHI) == 0) return checked((int)value.LLO);
-    throw new OverflowException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked long(UInt256Ex value)
-  {
-    if ((value.RHI | value.RLO | value.LHI) == 0) return checked((long)value.LLO);
-    throw new OverflowException();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked double(UInt256Ex value)
-  {
-    const double pow_2_256 = 115792089237316195423570985008687907853269984665640564039457584007913129639936.0;
-
-    double multiplier = ulong.MaxValue;
-    var result = (((((value.RHI * multiplier) + value.RLO) * multiplier) + value.LHI) * multiplier) + value.LLO;
-    if (result < 0 || result >= pow_2_256)
-      throw new OverflowException(nameof(value));
-    return result;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked decimal(UInt256Ex value)
-  {
-    ulong lo64 = value.LLO;
-
-    if (value.LHI <= uint.MaxValue)
-    {
-      uint hi32 = (uint)value.LHI;
-      return new decimal((int)lo64, (int)(lo64 >> 32), (int)hi32, isNegative: false, scale: 0);
-    }
-    throw new OverflowException(nameof(value));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked float(UInt256Ex value)
-  {
-    return checked((float)(double)value);
-  }
-
-
-  #endregion
-
   #endregion
 
   #region Parsing
 
   #region Parse
 
-  public static UInt256Ex Parse(ReadOnlySpan<char> value, int radix)
+  public static UInt512Ex Parse(ReadOnlySpan<char> value, int radix)
   {
     if (!new[] { 2, 8, 10, 16 }.Contains(radix))
       throw new ArgumentOutOfRangeException(nameof(radix));
@@ -1522,13 +1494,13 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static UInt256Ex FromDecSystem(ReadOnlySpan<char> value)
+  private static UInt512Ex FromDecSystem(ReadOnlySpan<char> value)
   {
-    if (value.Length == 0) return new UInt256Ex();
+    if (value.Length == 0) return new UInt512Ex();
     var cap = 1 + (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize * 8)));
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
-    if (val.Length == 0) return new UInt256Ex();
-    if (val.Length == 1 && val[0] == '0') return new UInt256Ex();
+    if (val.Length == 0) return new UInt512Ex();
+    if (val.Length == 1 && val[0] == '0') return new UInt512Ex();
     if (val.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
@@ -1541,16 +1513,16 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    return new UInt256Ex(result);
+    return new UInt512Ex(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static UInt256Ex FromBinSystem(ReadOnlySpan<char> value)
+  private static UInt512Ex FromBinSystem(ReadOnlySpan<char> value)
   {
-    if (value.Length == 0) return new UInt256Ex();
+    if (value.Length == 0) return new UInt512Ex();
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
-    if (val.Length == 0) return new UInt256Ex();
-    if (val.Length == 1 && val[0] == '0') return new UInt256Ex();
+    if (val.Length == 0) return new UInt512Ex();
+    if (val.Length == 1 && val[0] == '0') return new UInt512Ex();
     if (val.Length > TypeSize * 8 + 1) throw new ArgumentOutOfRangeException(nameof(value));
 
     var length = RealLength(val, TypeSize * 8) / 8;
@@ -1564,17 +1536,17 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    return new (result);
+    return new(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static UInt256Ex FromOctSystem(ReadOnlySpan<char> value)
+  private static UInt512Ex FromOctSystem(ReadOnlySpan<char> value)
   {
-    if (value.Length == 0) return new UInt256Ex();
+    if (value.Length == 0) return new UInt512Ex();
 
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
-    if (val.Length == 0) return new UInt256Ex();
-    if (val.Length == 1 && val[0] == '0') return new UInt256Ex();
+    if (val.Length == 0) return new UInt512Ex();
+    if (val.Length == 1 && val[0] == '0') return new UInt512Ex();
     int cap = Convert.ToInt32(TypeSize * Math.Log(256) / Math.Log(8)) + 1;
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 
@@ -1588,13 +1560,13 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    return new (result);
+    return new(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static UInt256Ex FromHexSystem(ReadOnlySpan<char> value)
+  private static UInt512Ex FromHexSystem(ReadOnlySpan<char> value)
   {
-    if (value.Length == 0) return new UInt256Ex();
+    if (value.Length == 0) return new UInt512Ex();
 
     var hex = "0123456789ABCDEF";
     var dict = new Dictionary<char, byte>();
@@ -1602,8 +1574,8 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       dict[hex[i]] = i;
 
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
-    if (val.Length == 0) return new UInt256Ex();
-    if (val.Length == 1 && val[0] == '0') return new UInt256Ex();
+    if (val.Length == 0) return new UInt512Ex();
+    if (val.Length == 1 && val[0] == '0') return new UInt512Ex();
     //int cap = Convert.ToInt32(TypeSize * Math.Log(256) / Math.Log(16)) + 1;
     int cap = Convert.ToInt32(TypeSize * 2) + 1;
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
@@ -1618,7 +1590,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    return new (result);
+    return new(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1658,30 +1630,29 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   #region TryParse
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool TryParse(ReadOnlySpan<char> value, out UInt256Ex ui256)
+  public static bool TryParse(ReadOnlySpan<char> value, out UInt512Ex uix)
   {
     var str = string.Join("", value.ToArray());
-    return TryParse(str, out ui256);
+    return TryParse(str, out uix);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool TryParse([NotNullWhen(true)] string value, out UInt256Ex ui256)
+  public static bool TryParse([NotNullWhen(true)] string value, out UInt512Ex ui512) 
   {
-    ui256 = 0;
+    ui512 = 0;
     var str = value.Replace("_", "");
     for (int i = 0; i < str.Length; i++)
     {
       if ("0123456789".Contains(str[i]))
-        ui256 = ui256 * 10 + ulong.Parse(str[i].ToString());
+        ui512 = ui512 * 10 + ulong.Parse(str[i].ToString());
       else
       {
-        ui256 = 0;
+        ui512 = 0;
         return false;
       }
     }
     return true;
   }
-
   #endregion
 
   #endregion

@@ -10,6 +10,7 @@ namespace michele.natale.Numbers;
 /// </remarks>
 internal interface IUIntExOperators<TSelf> where TSelf : IUIntExOperators<TSelf>?
 {
+
   /// <summary>Increments a value.</summary>
   /// <param name="value">The value to increment.</param>
   /// <returns>The result of incrementing <paramref name="value" />.</returns>
@@ -42,4 +43,5 @@ internal interface IUIntExOperators<TSelf> where TSelf : IUIntExOperators<TSelf>
   /// <exception cref="OverflowException">The absolute of 
   /// <paramref name="value" /> is not representable by <typeparamref name="TSelf" />.</exception>
   static abstract TSelf Abs(TSelf value);
+
 }
