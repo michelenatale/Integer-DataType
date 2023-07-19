@@ -1,9 +1,9 @@
 ﻿
 
+using System.Text;
+using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace michele.natale.Numbers;
 
@@ -27,7 +27,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   public const int TypeSize = 32;
 
   public static Int256Ex MaxValue =>
-    new(0x7FFF_FFFF_FFFF_FFFF, 0xFFFF_FFFF_FFFF_FFFF,
+    new(0x7FFF_FFFF_FFFF_FFFF, 0xFFFF_FFFF_FFFF_FFFF, 
         0xFFFF_FFFF_FFFF_FFFF, 0xFFFF_FFFF_FFFF_FFFF);
 
   public static Int256Ex MinValue => new(0x8000_0000_0000_0000, 0, 0, 0);
@@ -107,29 +107,29 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int256Ex operator ~(Int256Ex value)
   {
-    return new(BitwiseNot(value.ToUInts()));
+    return new( BitwiseNot(value.ToUInts()));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int256Ex operator &(Int256Ex left, Int256Ex right)
   {
-    return new(BitwiseAnd(left.ToValues(), right.ToValues(), TypeSize / 8));//ULong-Version
+    return new(BitwiseAnd(left.ToValues(),right.ToValues(),TypeSize / 8));//ULong-Version
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int256Ex operator |(Int256Ex left, Int256Ex right)
   {
-    return new(BitwiseOr(left.ToUInts(), right.ToUInts(), TypeSize / 4));
+    return new(BitwiseOr(left.ToUInts(),right.ToUInts(),TypeSize / 4));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int256Ex operator ^(Int256Ex left, Int256Ex right)
   {
-    return new(BitwiseXor(left.ToUInts(), right.ToUInts(), TypeSize / 4));
+    return new(BitwiseXor(left.ToUInts(),right.ToUInts(),TypeSize / 4));
   }
 
   #region Internal Methodes
-
+ 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] BitwiseNot(in uint[] value)
   {
@@ -161,7 +161,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     return result;
   }
 
-
+ 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] BitwiseOr(uint[] left, uint[] right, int typesize)
   {
@@ -179,7 +179,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     for (var i = 0; i < typesize; i++)
       result[i] = left[i] ^ right[i];
     return result;
-  }
+  } 
 
 
   #endregion
@@ -196,7 +196,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int256Ex operator checked -(Int256Ex value) => checked(Zero - value);
-
+ 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static ulong[] TwosComplement(ulong[] value)
   {
@@ -264,7 +264,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    return new(Addition(uil, uir, TypeSize / 4, out _));
+    return new(Addition(uil, uir, TypeSize / 4,out _));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -273,7 +273,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     var result = left + right;
     if (result.Sign == 0) return result;
 
-    var sign = left.Sign * right.Sign;
+    var sign = left.Sign * right.Sign; 
     if (sign < 1) return result;
     if (result.Sign == left.Sign) return result;
 
@@ -294,7 +294,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     var result = left - right;
     if (result.Sign == 0) return result;
 
-    var sign = left.Sign * right.Sign;
+    var sign = left.Sign * right.Sign; 
     if (sign >= 0) return result;
     if (result.Sign == left.Sign) return result;
 
@@ -317,7 +317,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     var result = left * right;
     if (result.Sign == 0) return result;
 
-    var sign = left.Sign * right.Sign;
+    var sign = left.Sign * right.Sign; 
     if (result.Sign == sign) return result;
 
     throw new OverflowException($"*.checked !");
@@ -334,10 +334,10 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     if (right == MaxValue) return 0;
 
     var sign = left.Sign * right.Sign;
-    Int256Ex l = Abs(left), r = Abs(right);
+    Int256Ex l = Abs(left),r = Abs(right);
 
     if (l == r) return sign;
-    if (r.IsOne) return left.Sign == sign ? left : -left;
+    if (r.IsOne) return left.Sign == sign ? left : -left; 
     if (r > l) return 0;
 
     var uil = l.ToUInts();
@@ -370,7 +370,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
 
     if (l == r) return sign;
     if (r.IsOne) return left.Sign == sign ? left : -left;
-    if (r > l) return left;
+    if (r > l) return left; 
 
     var uil = l.ToUInts();
     var uir = r.ToUInts();
@@ -394,9 +394,9 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
       r = ((left[i] & right[i]) | ((left[i] | right[i]) & (~result[i]))) >> rshift;
     }
     if (r != 0) over_flow = true;
-    return result;
+      return result;
   }
-
+ 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] Subtract(in uint[] left, in uint[] right, in int size, out bool over_flow)
   {
@@ -410,8 +410,8 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
       r = (((~left[i]) & right[i]) | (~(left[i] ^ right[i])) & result[i]) >> rshift;
     }
     if (r != 0) over_flow = true;
-    return result;
-  }
+      return result;
+  } 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] Multiplication(in uint[] left, in uint[] right, int typesize, out bool over_flow)
@@ -484,8 +484,8 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
       result = LeftShift(result, 1, typesize);
       if (GreaterThenEqualLE(l, r, typesize))
       {
-        l = Subtract(l, r, typesize, out _);
-        result = Addition(result, one, typesize, out _); // result.Lo |= 1;
+        l = Subtract(l, r, typesize,out _);
+        result = Addition(result, one, typesize,out _); // result.Lo |= 1;
       }
       r = RightShift(r, 1, typesize);
     }
@@ -541,7 +541,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     if (value.Sign == 0) return value;
     if (shiftamount < 0) return value << -shiftamount;
     if (value.IsMinusOne) return value; //rest here
-
+ 
     if (value.Sign < 0)
       return ~(new Int256Ex(RightShift((~value.LOHI).ToUInts(), shiftamount, TypeSize / 4)));
     return new(RightShift(value.ToUInts(), shiftamount, TypeSize / 4));
@@ -638,7 +638,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public override bool Equals([NotNullWhen(true)] object? obj)
   {
-    if (obj?.GetType() == typeof(Int256Ex))
+    if (obj?.GetType() == typeof(Int256Ex)) 
       this.Equals((Int256Ex)obj);
     return false;
   }
@@ -690,7 +690,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static bool operator <(Int256Ex left, Int256Ex right)
   {
-    return LessThenLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
+    return LessThenLE(left.ToUInts(), right.ToUInts(),TypeSize / 4);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -860,7 +860,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bits, 0, result, 0, TypeSize);
-    return new(result);
+    return new (result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -908,9 +908,9 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     var lohi = uilohi.ToValues();
     if (sign == 0) return new byte[1];
     else if (sign == 1)
-      lohi = BitwiseAnd(lohi, new ulong[]
+      lohi = BitwiseAnd(lohi, new ulong[] 
         {
-          0xFFFFFFFFFFFFFFFFul, 0xFFFFFFFFFFFFFFFFul, 0xFFFFFFFFFFFFFFFFul, 0x7FFF_FFFF_FFFF_FFFFul
+          0xFFFFFFFFFFFFFFFFul, 0xFFFFFFFFFFFFFFFFul, 0xFFFFFFFFFFFFFFFFul, 0x7FFF_FFFF_FFFF_FFFFul 
         }, TypeSize / 8);
     else if (radix == 10)
       lohi = TwosComplement(lohi);
@@ -1009,16 +1009,16 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator Int256Ex(sbyte value) => new(value);
+  public static implicit operator Int256Ex(sbyte value)=>new(value); 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator Int256Ex(short value) => new(value);
+  public static implicit operator Int256Ex(short value)=> new(value); 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator Int256Ex(int value) => new(value);
+  public static implicit operator Int256Ex(int value)=>new(value); 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static implicit operator Int256Ex(long value) => new(value);
+  public static implicit operator Int256Ex(long value)=>new(value); 
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static implicit operator Int256Ex(byte value) => new(0, 0, 0, value);
@@ -1048,8 +1048,8 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     if (value.Sign == 0) return new();
 
     var v = value.ToValues();
-    if (value.Sign == 1) return new(0, 0, v[1], v[0]);
-    return new(ulong.MaxValue, ulong.MaxValue, v[1], v[0]);
+    if(value.Sign == 1) return new(0, 0, v[1], v[0]);
+     return new(ulong.MaxValue, ulong.MaxValue, v[1], v[0]);
   }
 
   #endregion
@@ -1109,6 +1109,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     return new Int256Ex(ulongs);
   }
 
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator Int256Ex(UInt256Ex value) => new(value.ToValues());
 
@@ -1117,6 +1118,42 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   {
     if (value <= MaxValue.LOHI) return new(value.ToValues());
     throw new OverflowException($"{nameof(Int256Ex)}.checked !");
+  }
+
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator Int256Ex(Int512Ex value)
+  {
+    if (value.Sign == 0) return new();
+
+    var v = value.ToValues();
+    return new(v[3], v[2], v[1], v[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked Int256Ex(Int512Ex value)
+  {
+    if (value.Sign == 0) return new();
+    if (value < MinValue) throw new OverflowException(nameof(value));
+    if (value > MaxValue) throw new OverflowException(nameof(value));
+    return (Int256Ex)value;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator Int256Ex(UInt512Ex value)
+  {
+    if (value.IsZero) return new();
+
+    var v = value.ToValues();
+    return new(v[3], v[2], v[1], v[0]);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static explicit operator checked Int256Ex(UInt512Ex value)
+  {
+    if (value.IsZero) return new();
+    if (value > MaxValue.LOHI) throw new OverflowException(nameof(value));
+    return (Int256Ex)value;
   }
 
   #endregion
@@ -1431,7 +1468,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   public string ToString(IFormatProvider? provider) => throw new NotImplementedException();
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public object ToType(Type conversionType, IFormatProvider? provider) =>
+  public object ToType(Type conversionType, IFormatProvider? provider) => 
     throw new NotImplementedException();
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1483,7 +1520,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
     var bytes = Converter(bytesvalue, 10, 256);
     Array.Reverse(bytes);
-    Array.Resize(ref bytes, TypeSize);
+    Array.Resize(ref bytes, TypeSize); 
     if (!sign) return ToInt256Ex(bytes);
 
     var uints = new uint[TypeSize / 4];
@@ -1516,7 +1553,7 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
 
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
     if (val.Length == 0) return new Int256Ex();
-    if (val.Length == 1 && val[0] == '0') return new Int256Ex();
+    if (val.Length == 1 && val[0] == '0') return new Int256Ex(); 
     int cap = Convert.ToInt32(TypeSize * Math.Log(256) / Math.Log(8)) + 1;
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 

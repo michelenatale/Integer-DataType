@@ -1,9 +1,9 @@
 ﻿
 
+using System.Text;
+using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace michele.natale.Numbers;
 
@@ -293,7 +293,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
 
     if (l == r) return sign;
     if (r.IsOne) return left.Sign == sign ? left : -left;
-    if (r > l) return left;
+    if (r > l) return left; 
 
     var uil = l.ToUInts();
     var uir = r.ToUInts();
@@ -508,7 +508,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
     if (value.Sign == 0) return value;
     if (shiftamount < 0) return value << -shiftamount;
     if (value.IsMinusOne) return value; //rest here
-
+ 
     if (value.Sign < 0)
       return ~(new Int512Ex(RightShift((~value.LOHI).ToUInts(), shiftamount, TypeSize / 4)));
     return new(RightShift(value.ToUInts(), shiftamount, TypeSize / 4));
@@ -734,7 +734,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public Span<byte> ToSpan(bool littleendian = true) =>
+  public Span<byte> ToSpan(bool littleendian = true) => 
     ToBytes(littleendian);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -771,7 +771,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
       var ui512 = -value.LOHI;
       if ((exp & 1) == 0) return (Int512Ex)UInt512Ex.Pow(ui512, exp);
       else return -(Int512Ex)UInt512Ex.Pow(ui512, exp);
-    }
+    }    
     return (Int512Ex)UInt512Ex.Pow(value.LOHI, exp);
   }
 
@@ -1006,7 +1006,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
 
     var v = value.ToValues();
     if (value.Sign == 1) return new(0, 0, 0, 0, 0, 0, v[1], v[0]);
-    return new(ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, ulong.MaxValue,
+    return new(ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, 
                ulong.MaxValue, ulong.MaxValue, v[1], v[0]);
   }
 
@@ -1485,7 +1485,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
 
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
     if (val.Length == 0) return new Int512Ex();
-    if (val.Length == 1 && val[0] == '0') return new Int512Ex();
+    if (val.Length == 1 && val[0] == '0') return new Int512Ex(); 
     int cap = Convert.ToInt32(TypeSize * 2) + 1;
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 
