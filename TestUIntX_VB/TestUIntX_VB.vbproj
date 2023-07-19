@@ -5,6 +5,14 @@
     <RootNamespace>TestUIntX_VB</RootNamespace>
     <TargetFramework>net7.0</TargetFramework>
     <Platforms>AnyCPU;x64</Platforms>
+    <IsPublishable>False</IsPublishable>
+    <OptionStrict>On</OptionStrict>
+
+    <Authors>© Michele Natale 2023</Authors>
+    <Product>© UIntX 2023</Product>
+    <Company>© Michele Natale 2023</Company>
+    <Description>A very simple 128/256/512 bit data structure for unsigned and signed integers.</Description>
+    <Copyright>© UintX 2023 created by © Michele Natale 2023</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
