@@ -1,10 +1,10 @@
 ﻿
- 
-using System.Text;
+
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace michele.natale.Numbers;
 
@@ -82,7 +82,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   public UInt128Ex()
   {
     this.HI = this.LO = 0;
-  } 
+  }
 
 
   /// <summary>
@@ -282,7 +282,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     UInt128Ex hi = ah * bh + t.HI + tl.HI;
     if (hi == 0ul) return /* -lo- */ new(tl.LO, ml.LO);
     throw new OverflowException();
-  } 
+  }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static UInt128Ex operator /(UInt128Ex left, UInt128Ex right)
@@ -364,7 +364,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     if (position > 63)
       return (int)((this.HI >> (position - 64)) & 1UL);
     return (int)((this.LO >> position) & 1UL);
-  } 
+  }
 
   internal int Length
   {
@@ -669,7 +669,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     if (ulongs.Length > TypeSize / 8) throw new ArgumentOutOfRangeException(nameof(ulongs));
 
     var bits = new ulong[TypeSize / 8];
-    Array.Copy(ulongs.ToArray(), bits, TypeSize / 8); 
+    Array.Copy(ulongs.ToArray(), bits, TypeSize / 8);
     if (!littleendian) Array.Reverse(bits);
 
     return new UInt128Ex(bits[1], bits[0]);
@@ -740,7 +740,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     return result;
   }
 
- 
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] PowerOfTwo(int exp, int tsize, out bool overflow)
   {
@@ -760,7 +760,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     if (exp >= max) overflow = true;
     return result;
   }
- 
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] Multiplication(uint[] left, in uint[] right, int tsize, out bool over_flow)
   {
@@ -802,7 +802,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
 
   [SkipLocalsInit]
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  internal static UInt128Ex PopCount(UInt128Ex value) => 
+  internal static UInt128Ex PopCount(UInt128Ex value) =>
     ulong.PopCount(value.LO) + ulong.PopCount(value.HI);
 
   [SkipLocalsInit]
@@ -847,7 +847,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
       16 => ToHexSystem(bytes),
       _ => throw new ArgumentOutOfRangeException(nameof(radix)),
     };
-  } 
+  }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static string ToDualSystem(ReadOnlySpan<byte> bytes)
@@ -1426,9 +1426,9 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
     if (val.Length == 0) return new UInt128Ex();
     if (val.Length == 1 && val[0] == '0') return new UInt128Ex();
-    var cap = 1 + (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize* 8)));
+    var cap = 1 + (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize * 8)));
     if (val.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
-    
+
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
     var tmp = Converter(bytesvalue, 10, 256);
     Array.Reverse(tmp);
@@ -1491,7 +1491,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static UInt128Ex FromHexSystem(ReadOnlySpan<char> value)
   {
-    if (value.Length == 0) return new UInt128Ex(); 
+    if (value.Length == 0) return new UInt128Ex();
 
     var hex = "0123456789ABCDEF";
     var dict = new Dictionary<char, byte>();
@@ -1563,7 +1563,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   public static bool TryParse([NotNullWhen(true)] string value, out UInt128Ex ui128)
   {
     ui128 = 0;
-    var str = value.Replace("_","");
+    var str = value.Replace("_", "");
     for (int i = 0; i < str.Length; i++)
     {
       if ("0123456789".Contains(str[i]))

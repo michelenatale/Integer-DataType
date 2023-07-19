@@ -4,7 +4,6 @@
 namespace michele.natale.Numbers;
 
 
-
 /// <summary>Defines a mechanism for Operations.</summary>
 /// <typeparam name="TSelf">The type that implements this interface.</typeparam>
 /// <typeparam name="TOther">The type that will multiply <typeparamref name="TSelf" />.</typeparam>

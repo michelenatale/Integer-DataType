@@ -12,7 +12,7 @@ using static Randomholder;
 public class TestUInt512Ex
 {
   public static void Start()
-  { 
+  {
 
     TestSizeOf();
     TestInstance();
@@ -157,13 +157,13 @@ public class TestUInt512Ex
     var decstr = instance.ToString(10);
     var hexstr = instance.ToString(16);
 
-    var ui512 = UInt512Ex.Parse(binstr,2);
+    var ui512 = UInt512Ex.Parse(binstr, 2);
 
-    ui512 = UInt512Ex.Parse(octstr,8);
+    ui512 = UInt512Ex.Parse(octstr, 8);
 
-    ui512 = UInt512Ex.Parse(decstr,10);
+    ui512 = UInt512Ex.Parse(decstr, 10);
 
-    ui512 = UInt512Ex.Parse(hexstr,16);
+    ui512 = UInt512Ex.Parse(hexstr, 16);
   }
 
   private static void TestParse()
@@ -307,10 +307,10 @@ public class TestUInt512Ex
     var lo_hi = new ulong[] { v0, v1, v2, v3, v4, v5, v6, v7 };
     var instance = new UInt512Ex(lo_hi);
 
-    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64()); 
+    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     instance += number;
 
-    var r = (ulong)(Rand.NextInt64() * Rand.NextInt64()); 
+    var r = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     instance |= r;
   }
 
@@ -327,11 +327,11 @@ public class TestUInt512Ex
 
     var lo_hi = new ulong[] { v0, v1, v2, v3, v4, v5, v6, v7 };
     var instance = new UInt512Ex(lo_hi);
-    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64()); 
+    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     instance += number;
 
     var r = (ulong)(Rand.NextInt64() * Rand.NextInt64());
- 
+
     instance ^= r;
   }
 
@@ -349,22 +349,22 @@ public class TestUInt512Ex
     var lo_hi = new ulong[] { v0, v1, v2, v3, v4, v5, v6, v7 };
     var instance = new UInt512Ex(lo_hi);
 
-    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64()); 
+    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     instance += number;
 
     var l = 1 + (int)double.Truncate(Math.Log10(Math.Pow(2, 512)));
     var r = Rand.Next(0, l);
- 
+
     instance <<= r;
 
 
     r = Rand.Next(0, l);
- 
+
     instance >>= r;
 
 
     r = Rand.Next(0, l);
- 
+
     instance >>>= r;
   }
 
@@ -601,7 +601,7 @@ public class TestUInt512Ex
   }
 
   private static void TestPow()
-  { 
+  {
 
     var instance = new UInt512Ex(Rand.Next());
 
@@ -617,7 +617,7 @@ public class TestUInt512Ex
 
     e = Rand.Next(0, 39);
     var p10 = UInt512Ex.PowerOfTen(e, out overflow);
-    if (overflow) throw new ArgumentException(null); 
+    if (overflow) throw new ArgumentException(null);
   }
 
   private static void TestNegate()

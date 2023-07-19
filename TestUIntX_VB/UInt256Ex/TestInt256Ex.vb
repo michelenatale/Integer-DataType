@@ -1,7 +1,7 @@
 Option Strict On
 Option Explicit On
-Imports michele.natale.Numbers
 Imports System.Runtime.InteropServices
+Imports michele.natale.Numbers
 
 Namespace TestUIntX
 
@@ -326,8 +326,10 @@ Namespace TestUIntX
       r = Rand.[Next](0, l)
       instance >>= r
 
-      'r = Rand.[Next](0, l)
+      r = Rand.[Next](0, l)
       'instance >>>= r 
+      instance = Int256Ex.op_UnsignedRightShift(instance, r)
+
     End Sub
 
     Private Sub TestIsZeroOne()

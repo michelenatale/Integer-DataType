@@ -1,7 +1,7 @@
 ﻿
 
-using System.Numerics;
 using michele.natale.Numbers;
+using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace TestUIntX;
@@ -144,7 +144,7 @@ public class TestInt512Ex
     var v5 = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     var v6 = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     var v7 = (ulong)(Rand.NextInt64() * Rand.NextInt64());
- 
+
     var lo_hi = new ulong[] { v0, v1, v2, v3, v4, v5, v6, v7 };
     var instance = new Int512Ex(lo_hi);
 

@@ -1,8 +1,8 @@
 ﻿
 
-using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace michele.natale.Numbers;
@@ -17,7 +17,6 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
 {
 
   #region Variables
-
 
   [FieldOffset(0)]
   private readonly UInt512Ex LOHI = 0;
@@ -61,15 +60,20 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
 
   #region Constructors
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Int512Ex() => LOHI = new UInt512Ex();
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Int512Ex(long value) => LOHI = new(value);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Int512Ex(in Int512Ex value) => LOHI = value.LOHI;
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Int512Ex(ulong v7, ulong v6, ulong v5, ulong v4, ulong v3, ulong v2, ulong v1, ulong v0) =>
     LOHI = new UInt512Ex(v7, v6, v5, v4, v3, v2, v1, v0);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private Int512Ex(uint[] values_le)
   {
     var result = new ulong[TypeSize / 8];
@@ -78,6 +82,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
     this.LOHI = new(result);
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Int512Ex(ReadOnlySpan<ulong> lohis, bool islittleendian = true) =>
     LOHI = new UInt512Ex(lohis, islittleendian);
 
@@ -288,7 +293,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
 
     if (l == r) return sign;
     if (r.IsOne) return left.Sign == sign ? left : -left;
-    if (r > l) return left; 
+    if (r > l) return left;
 
     var uil = l.ToUInts();
     var uir = r.ToUInts();
@@ -487,11 +492,9 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int512Ex operator <<(Int512Ex value, int shiftamount)
   {
-    //shiftamount &= 0x1FF;
     if (shiftamount == 0) return value;
     if (value.Sign == 0) return value;
     if (shiftamount < 0) return value >> -shiftamount;
-    //shiftamount &= 63;
 
     var uints = LeftShift(value.ToUInts(), shiftamount, TypeSize / 4);
     return new(uints);
@@ -506,16 +509,8 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
     if (shiftamount < 0) return value << -shiftamount;
     if (value.IsMinusOne) return value; //rest here
 
-    var sign = value.Sign;
-    if (sign < 0)
-    {
-      //Right now, I think that's a good approach.
-      //Will look at it again at a later date.
-      var binstr = value.ToString(2);
-      binstr = new string('1', shiftamount) +
-               string.Join("", binstr.Take(binstr.Length - shiftamount));
-      return Parse(binstr, 2);
-    }
+    if (value.Sign < 0)
+      return ~(new Int512Ex(RightShift((~value.LOHI).ToUInts(), shiftamount, TypeSize / 4)));
     return new(RightShift(value.ToUInts(), shiftamount, TypeSize / 4));
   }
 
@@ -526,10 +521,6 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
     if (shiftamount == 0) return value;
     if (value.Sign == 0) return value;
     if (shiftamount < 0) return value << -shiftamount;
-
-    //Right now, I think that's a good approach.
-    //Will look at it again at a later date.
-    //var sign = value.Sign;
     return new(RightShift(value.ToUInts(), shiftamount, TypeSize / 4));
   }
 
@@ -743,7 +734,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public Span<byte> ToSpan(bool littleendian = true) => 
+  public Span<byte> ToSpan(bool littleendian = true) =>
     ToBytes(littleendian);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -780,7 +771,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
       var ui512 = -value.LOHI;
       if ((exp & 1) == 0) return (Int512Ex)UInt512Ex.Pow(ui512, exp);
       else return -(Int512Ex)UInt512Ex.Pow(ui512, exp);
-    }    
+    }
     return (Int512Ex)UInt512Ex.Pow(value.LOHI, exp);
   }
 
@@ -839,10 +830,6 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
     if (!littleendian) Array.Reverse(bits);
     return new(bits);
   }
-
-  #region Internal Methodes
-
-  #endregion
 
   #endregion
 
@@ -1019,7 +1006,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
 
     var v = value.ToValues();
     if (value.Sign == 1) return new(0, 0, 0, 0, 0, 0, v[1], v[0]);
-    return new(ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, 
+    return new(ulong.MaxValue, ulong.MaxValue, ulong.MaxValue, ulong.MaxValue,
                ulong.MaxValue, ulong.MaxValue, v[1], v[0]);
   }
 
@@ -1116,8 +1103,7 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
   #region Conversion from Int512Ex
 
   #region Implicit Conversion from Int512Ex
-
-
+  //No Implicit Conversion from Int512Ex
   #endregion
 
   #region Explicit Conversion from Int512Ex
@@ -1500,7 +1486,6 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
     if (val.Length == 0) return new Int512Ex();
     if (val.Length == 1 && val[0] == '0') return new Int512Ex();
-    //int cap = Convert.ToInt32(TypeSize * Math.Log(256) / Math.Log(16)) + 1;
     int cap = Convert.ToInt32(TypeSize * 2) + 1;
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 

@@ -1,9 +1,9 @@
 ﻿
 
-using System.Text;
-using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace michele.natale.Numbers;
 
@@ -45,10 +45,10 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   /// Current TypeSize of this Datatype
   /// </summary>
   public const int TypeSize = 64;
- 
-  public static UInt512Ex MinValue =>  new();
- 
-  public static UInt512Ex MaxValue =>  new(-1);
+
+  public static UInt512Ex MinValue => new();
+
+  public static UInt512Ex MaxValue => new(-1);
 
   public bool IsZero
   {
@@ -67,7 +67,7 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     get => this.V0 == ulong.MaxValue && this.V1 == ulong.MaxValue && this.V2 == ulong.MaxValue && this.V3 == ulong.MaxValue &&
            this.V4 == ulong.MaxValue && this.V5 == ulong.MaxValue && this.V6 == ulong.MaxValue && this.V7 == ulong.MaxValue;
-  } 
+  }
 
   /// <summary>One = 1</summary> 
   public readonly static UInt256Ex One = new(1);
@@ -227,7 +227,7 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
     if (value.SequenceEqual(one)) return mv;
     one[0] = 1;
     if (value.SequenceEqual(mv)) return new uint[value.Length];
-    var result = Subtract(mv, value, value.Length,out _);
+    var result = Subtract(mv, value, value.Length, out _);
     return result;
   }
 
@@ -272,11 +272,11 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   public static UInt512Ex operator -(UInt512Ex value)
   {
     //return Negate(value);
-    return new( NegateUnsigned(value.ToUInts(), TypeSize / 4));
+    return new(NegateUnsigned(value.ToUInts(), TypeSize / 4));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static uint[] NegateUnsigned(in uint[] value, in int size)
+  private static uint[] NegateUnsigned(in uint[] value, in int size)
   {
     //=> MaxValue - ui + One;
     var r = 1U;
@@ -368,7 +368,7 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    var result = new UInt512Ex(Addition(uil, uir, TypeSize / 4,out var isoverflow));
+    var result = new UInt512Ex(Addition(uil, uir, TypeSize / 4, out var isoverflow));
     if (!isoverflow) return result;
     throw new OverflowException($"{nameof(Addition)}.Checked");
   }
@@ -413,7 +413,7 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
     if (r != 0)
       isoverflow = true;
     return result;
-  } 
+  }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] Subtract(in uint[] left, in uint[] right, in int size, out bool isoverflow)
@@ -429,8 +429,8 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
     }
     if (r != 0)
       isoverflow = true;
-      return result; 
-  } 
+    return result;
+  }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] Multiplication(in uint[] left, in uint[] right, int typesize, out bool over_flow)
@@ -503,8 +503,8 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
       result = LeftShift(result, 1, typesize);
       if (GreaterThenEqualLE(l, r, typesize))
       {
-        l = Subtract(l, r, typesize,out _);
-        result = Addition(result, one, typesize,out _); // result.Lo |= 1;
+        l = Subtract(l, r, typesize, out _);
+        result = Addition(result, one, typesize, out _); // result.Lo |= 1;
       }
       r = RightShift(r, 1, typesize);
     }
@@ -675,9 +675,9 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
     LessThenLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool operator >(UInt512Ex left, UInt512Ex right) => 
+  public static bool operator >(UInt512Ex left, UInt512Ex right) =>
     GreaterThenLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
-    
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static bool operator <=(UInt512Ex left, UInt512Ex right) =>
     LessThenEqualLE(left.ToUInts(), right.ToUInts(), TypeSize / 4);
@@ -1164,7 +1164,7 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   public static explicit operator checked UInt512Ex(double value)
   {
     const double pow_2_512 = 13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084096.0;
- 
+
     if (value < 0.0) throw new ArgumentOutOfRangeException(nameof(value));
     if (double.IsInfinity(value)) throw new OverflowException(nameof(value));
     if (value >= pow_2_512) throw new ArgumentOutOfRangeException(nameof(value));
@@ -1249,7 +1249,7 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
     }
 
     if (value <= ulong.MaxValue)
-      result = new UInt512Ex(0, 0, 0, 0, 0, 0, 0,(ulong)value);
+      result = new UInt512Ex(0, 0, 0, 0, 0, 0, 0, (ulong)value);
     else
     {
       int shift = Math.Max((int)Math.Ceiling(Math.Log(value, 2)) - 63, 0);
@@ -1279,34 +1279,34 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   public static explicit operator byte(UInt512Ex value) => (byte)value.V0;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator ushort(UInt512Ex value) =>  (ushort)value.V0;
+  public static explicit operator ushort(UInt512Ex value) => (ushort)value.V0;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator uint(UInt512Ex value) =>    (uint)value.V0;
+  public static explicit operator uint(UInt512Ex value) => (uint)value.V0;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator ulong(UInt512Ex value) =>   value.V0;
+  public static explicit operator ulong(UInt512Ex value) => value.V0;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator char(UInt512Ex value) =>    (char)value.V0;
+  public static explicit operator char(UInt512Ex value) => (char)value.V0;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator sbyte(UInt512Ex value) =>   (sbyte)value.V0;
+  public static explicit operator sbyte(UInt512Ex value) => (sbyte)value.V0;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator short(UInt512Ex value) =>   (short)value.V0;
+  public static explicit operator short(UInt512Ex value) => (short)value.V0;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator int(UInt512Ex value) =>     (int)value.V0;
+  public static explicit operator int(UInt512Ex value) => (int)value.V0;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator long(UInt512Ex value) =>    (long)value.V0;
+  public static explicit operator long(UInt512Ex value) => (long)value.V0;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator double(UInt512Ex value)
   {
     double multiplier = ulong.MaxValue;
-    var result = (((((((((((((value.V7 * multiplier) + value.V6) * multiplier) + value.V5) * multiplier) + value.V4) 
+    var result = (((((((((((((value.V7 * multiplier) + value.V6) * multiplier) + value.V5) * multiplier) + value.V4)
                  * multiplier) + value.V3) * multiplier) + value.V2) * multiplier) + value.V1) * multiplier) + value.V0;
     return result;
   }
@@ -1384,7 +1384,7 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   public static explicit operator checked double(UInt512Ex value)
   {
     const double pow_2_512 = 13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084096.0;
- 
+
     double multiplier = ulong.MaxValue;
     var result = (((((((((((((value.V7 * multiplier) + value.V6) * multiplier) + value.V5) * multiplier) + value.V4)
                  * multiplier) + value.V3) * multiplier) + value.V2) * multiplier) + value.V1) * multiplier) + value.V0;
@@ -1637,7 +1637,7 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool TryParse([NotNullWhen(true)] string value, out UInt512Ex ui512) 
+  public static bool TryParse([NotNullWhen(true)] string value, out UInt512Ex ui512)
   {
     ui512 = 0;
     var str = value.Replace("_", "");

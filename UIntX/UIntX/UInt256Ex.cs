@@ -1,8 +1,8 @@
 ﻿
-using System.Text;
-using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices; 
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace michele.natale.Numbers;
 
@@ -252,8 +252,8 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   public static UInt256Ex operator +(UInt256Ex value) => new(value);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt256Ex operator -(UInt256Ex value) => 
-    new (NegateUnsigned(value.ToValues(), TypeSize / 8));
+  public static UInt256Ex operator -(UInt256Ex value) =>
+    new(NegateUnsigned(value.ToValues(), TypeSize / 8));
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static ulong[] NegateUnsigned(in ulong[] value, in int size)
@@ -917,7 +917,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static UInt256Ex ToUInt256Ex(ReadOnlySpan<byte> bytes, bool littleendian = true)
   {
-    if (bytes.Length > TypeSize)  
+    if (bytes.Length > TypeSize)
       throw new ArgumentOutOfRangeException(nameof(bytes));
 
     var bits = new byte[TypeSize];
@@ -940,7 +940,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bits, 0, result, 0, TypeSize);
-    return new (result);
+    return new(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -952,7 +952,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     Array.Copy(ulongs.ToArray(), bits, TypeSize / 8);
     if (!littleendian) Array.Reverse(bits);
 
-    return new (bits);
+    return new(bits);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1075,7 +1075,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   public char ToChar(IFormatProvider? provider) => (char)this;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public DateTime ToDateTime(IFormatProvider? provider) => 
+  public DateTime ToDateTime(IFormatProvider? provider) =>
     Convert.ToDateTime(this.ToDecimal(provider), provider);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1564,7 +1564,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    return new (result);
+    return new(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1588,7 +1588,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    return new (result);
+    return new(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1618,7 +1618,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
-    return new (result);
+    return new(result);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]

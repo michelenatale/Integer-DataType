@@ -5,7 +5,7 @@ namespace michele.natale.Numbers;
 /// <summary>Defines a mechanism for Operations.</summary>
 /// <typeparam name="TSelf">The type that implements this interface.</typeparam>
 /// <typeparam name="TResult">The type that contains the product of 
-/// <typeparamref name="TSelf" /> and <typeparamref name="TOther" />.</typeparam>
+/// <typeparamref name="TSelf" /> and <typeparamref name="TResult" />.</typeparam>
 /// <remarks>
 /// <see href="https://github.com/dotnet/designs/tree/main/accepted/2021/statics-in-interfaces"></see>
 /// </remarks>

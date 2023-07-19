@@ -1,6 +1,4 @@
-﻿
-
-using michele.natale.Numbers;
+﻿using michele.natale.Numbers;
 using System.Runtime.InteropServices;
 
 namespace TestUIntX;
@@ -13,8 +11,6 @@ public class TestInt128Ex
 {
   public static void Start()
   {
-
-
     TestSizeOf();
     TestInstance();
     TestConverts();
@@ -163,13 +159,13 @@ public class TestInt128Ex
     var decstr = instance.ToString(10);
     var hexstr = instance.ToString(16);
 
-    var i128 = Int128Ex.Parse(decstr,10);
+    var i128 = Int128Ex.Parse(decstr, 10);
 
-    i128 = Int128Ex.Parse(binstr,2);
+    i128 = Int128Ex.Parse(binstr, 2);
 
-    i128 = Int128Ex.Parse(octstr,8);
+    i128 = Int128Ex.Parse(octstr, 8);
 
-    i128 = Int128Ex.Parse(hexstr,16);
+    i128 = Int128Ex.Parse(hexstr, 16);
   }
 
   private static void TestParse()

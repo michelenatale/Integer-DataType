@@ -12,7 +12,7 @@ using static Randomholder;
 public class TestUInt256Ex
 {
   public static void Start()
-  { 
+  {
 
     TestSizeOf();
     TestInstance();
@@ -148,13 +148,13 @@ public class TestUInt256Ex
     var decstr = instance.ToString(10);
     var hexstr = instance.ToString(16);
 
-    var ui128 = UInt256Ex.Parse(binstr,2);
+    var ui128 = UInt256Ex.Parse(binstr, 2);
 
-    ui128 = UInt256Ex.Parse(octstr,8);
+    ui128 = UInt256Ex.Parse(octstr, 8);
 
-    ui128 = UInt256Ex.Parse(decstr,10);
+    ui128 = UInt256Ex.Parse(decstr, 10);
 
-    ui128 = UInt256Ex.Parse(hexstr,16);
+    ui128 = UInt256Ex.Parse(hexstr, 16);
   }
 
   private static void TestParse()
@@ -278,10 +278,10 @@ public class TestUInt256Ex
     var lo_hi = new ulong[] { llo, lhi, rlo, rhi };
     var instance = new UInt256Ex(lo_hi);
 
-    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64()); 
+    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     instance += number;
 
-    var r = (ulong)(Rand.NextInt64() * Rand.NextInt64()); 
+    var r = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     instance |= r;
   }
 
@@ -295,11 +295,11 @@ public class TestUInt256Ex
     var lo_hi = new ulong[] { llo, lhi, rlo, rhi };
     var instance = new UInt256Ex(lo_hi);
 
-    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64()); 
+    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     instance += number;
 
     var r = (ulong)(Rand.NextInt64() * Rand.NextInt64());
- 
+
     instance ^= r;
   }
 
@@ -313,22 +313,22 @@ public class TestUInt256Ex
     var lo_hi = new ulong[] { llo, lhi, rlo, rhi };
     var instance = new UInt256Ex(lo_hi);
 
-    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64()); 
+    var number = (ulong)(Rand.NextInt64() * Rand.NextInt64());
     instance += number;
 
     var l = 1 + (int)double.Truncate(Math.Log10(Math.Pow(2, 256)));
     var r = Rand.Next(0, l);
- 
+
     instance <<= r;
 
 
     r = Rand.Next(0, l);
- 
+
     instance >>= r;
 
 
     r = Rand.Next(0, l);
- 
+
     instance >>>= r;
   }
 
@@ -529,7 +529,7 @@ public class TestUInt256Ex
   }
 
   private static void TestPow()
-  { 
+  {
 
     var instance = new UInt256Ex();
 

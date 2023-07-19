@@ -13,8 +13,6 @@ public class TestUInt128Ex
 {
   public static void Start()
   {
-    //TestNsc();
-
     TestSizeOf();
     TestInstance();
     TestConverts();
@@ -142,13 +140,13 @@ public class TestUInt128Ex
     var decstr = instance.ToString(10);
     var hexstr = instance.ToString(16);
 
-    var ui128 = UInt128Ex.Parse(binstr,2);
+    var ui128 = UInt128Ex.Parse(binstr, 2);
 
-    ui128 = UInt128Ex.Parse(octstr,8);
+    ui128 = UInt128Ex.Parse(octstr, 8);
 
-    ui128 = UInt128Ex.Parse(decstr,10);
+    ui128 = UInt128Ex.Parse(decstr, 10);
 
-    ui128 = UInt128Ex.Parse(hexstr,16);
+    ui128 = UInt128Ex.Parse(hexstr, 16);
   }
 
   private static void TestParse()

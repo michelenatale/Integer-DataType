@@ -1,12 +1,12 @@
 Option Strict On
 Option Explicit On
+
 Imports System.Runtime.InteropServices
 Imports michele.natale.Numbers
 
 Namespace TestUIntX
 
   Public Module TestInt128Ex
-
 
     Public Sub Start()
       TestSizeOf()
@@ -306,8 +306,10 @@ Namespace TestUIntX
       r = Rand.[Next](0, l)
       instance >>= r
 
-      'r = Rand.[Next](0, l)
+      r = Rand.[Next](0, l)
       'instance >>>= r 
+      instance = Int128Ex.op_UnsignedRightShift(instance, r)
+
     End Sub
 
     Private Sub TestIsZeroOne()

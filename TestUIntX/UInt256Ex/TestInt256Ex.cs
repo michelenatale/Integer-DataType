@@ -171,13 +171,13 @@ public class TestInt256Ex
     var decstr = instance.ToString(10);
     var hexstr = instance.ToString(16);
 
-    var i128 = Int256Ex.Parse(decstr,10);
+    var i128 = Int256Ex.Parse(decstr, 10);
 
-    i128 = Int256Ex.Parse(binstr,2);
+    i128 = Int256Ex.Parse(binstr, 2);
 
-    i128 = Int256Ex.Parse(octstr,8);
+    i128 = Int256Ex.Parse(octstr, 8);
 
-    i128 = Int256Ex.Parse(hexstr,16);
+    i128 = Int256Ex.Parse(hexstr, 16);
   }
 
   private static void TestParse()

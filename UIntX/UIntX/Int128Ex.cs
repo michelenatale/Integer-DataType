@@ -1,9 +1,9 @@
 ﻿
 
-using System.Text;
-using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace michele.natale.Numbers;
 
@@ -40,7 +40,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   public readonly bool IsMinusOne
   {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    get => this.LOHI .IsMinusOne;
+    get => this.LOHI.IsMinusOne;
   }
 
   public static Int128Ex MaxValue
@@ -90,7 +90,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   /// <remarks>Created by © Michele Natale</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Int128Ex()
-  { 
+  {
     this.LOHI = new UInt128Ex();
   }
 
@@ -587,7 +587,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     if (ulongs.Length > TypeSize / 8) throw new ArgumentOutOfRangeException(nameof(ulongs));
 
     var bits = new ulong[TypeSize / 8];
-    Array.Copy(ulongs.ToArray(),bits, ulongs.Length * 8); 
+    Array.Copy(ulongs.ToArray(), bits, ulongs.Length * 8);
     if (!littleendian) Array.Reverse(bits);
 
     return new Int128Ex(bits[1], bits[0]);
@@ -779,7 +779,6 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
   #region Conversion to Int128Ex
 
-
   #region Implicit Conversion to Int128Ex
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -910,10 +909,11 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     if (value.Sign == 0) return new();
 
     var v = value.ToValues();
-    if (value.Sign == 1) { 
-    if (v[1] >= 0x8000_0000_0000_0000ul)
-      throw new OverflowException(nameof(value));
-      return new(v[1],v[0]);
+    if (value.Sign == 1)
+    {
+      if (v[1] >= 0x8000_0000_0000_0000ul)
+        throw new OverflowException(nameof(value));
+      return new(v[1], v[0]);
     }
     if (v[3] >= 0x8000_0000_0000_0000ul)
       throw new OverflowException(nameof(value));
@@ -973,7 +973,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   public static explicit operator ulong(Int128Ex value)
   {
     var lohi = value.LOHI.ToValues();
-    return (ulong)lohi[0];
+    return lohi[0];
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1450,7 +1450,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     var length = data.Length - cz;
     while (length++ % typesize != 0) ;
     return length - 1;
-  } 
+  }
 
   #endregion
 

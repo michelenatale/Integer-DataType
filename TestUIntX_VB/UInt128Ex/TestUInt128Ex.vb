@@ -2,8 +2,8 @@
 Option Strict On
 Option Explicit On
 
-Imports michele.natale.Numbers
 Imports System.Runtime.InteropServices
+Imports michele.natale.Numbers
 
 Namespace TestUIntX
 
@@ -11,7 +11,6 @@ Namespace TestUIntX
 
 
     Public Sub Start()
-      'TestNsc();
 
       TestSizeOf()
       TestInstance()
@@ -299,8 +298,10 @@ Namespace TestUIntX
       instance >>= r
 
 
-      'r = Rand.[Next](0, l)
+      r = Rand.[Next](0, l)
       'ui128 >>>= r 
+      ui128 = UInt128.op_UnsignedRightShift(ui128, r)
+      instance = UInt128Ex.op_UnsignedRightShift(instance, r)
 
     End Sub
 
