@@ -1109,7 +1109,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     return new Int256Ex(ulongs);
   }
 
-
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator Int256Ex(UInt256Ex value) => new(value.ToValues());
 
@@ -1364,42 +1363,23 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked double(Int256Ex value)
   {
-    const double pow_2_255 = 57896044618658097711785492504343953926634992332820282019728792003956564819968.0;
-    const double pow_2_255n = -57896044618658097711785492504343953926634992332820282019728792003956564819968.0;
-
-    double tmp;
-    if (value.Sign == -1)
-    {
-      value = -value;
-      tmp = -(double)(UInt256Ex)value;
-      if (tmp >= pow_2_255n) return tmp;
-    }
-    else
-    {
-      tmp = (double)(UInt256Ex)value;
-      if (tmp < pow_2_255) return tmp;
-    }
-
-    throw new NotImplementedException();
+    return (double)value;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked decimal(Int256Ex value)
   {
-    const double pow_2_255 = 57896044618658097711785492504343953926634992332820282019728792003956564819968.0;
-    const double pow_2_255n = -57896044618658097711785492504343953926634992332820282019728792003956564819968.0;
-
     double tmp;
     if (value.Sign == -1)
     {
       value = -value;
       tmp = -(double)(UInt256Ex)value;
-      if (tmp >= pow_2_255n) return -(decimal)(UInt256Ex)value;
+      if (tmp >= (double)decimal.MinValue) return -(decimal)(UInt256Ex)value;
     }
     else
     {
       tmp = (double)(UInt256Ex)value;
-      if (tmp > pow_2_255) return (decimal)(UInt256Ex)value;
+      if (tmp <= (double)decimal.MaxValue) return (decimal)(UInt256Ex)value;
     }
     throw new NotImplementedException();
   }
@@ -1407,20 +1387,17 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked float(Int256Ex value)
   {
-    const double pow_2_255 = 57896044618658097711785492504343953926634992332820282019728792003956564819968.0;
-    const double pow_2_255n = -57896044618658097711785492504343953926634992332820282019728792003956564819968.0;
-
     double tmp;
     if (value.Sign == -1)
     {
       value = -value;
       tmp = -(double)(UInt256Ex)value;
-      if (tmp >= pow_2_255n) return -(float)(UInt256Ex)value;
+      if (tmp >= float.MinValue) return -(float)(UInt256Ex)value;
     }
     else
     {
       tmp = (double)(UInt256Ex)value;
-      if (tmp > pow_2_255) return (float)(UInt256Ex)value;
+      if (tmp <= float.MaxValue) return (float)(UInt256Ex)value;
     }
     throw new NotImplementedException();
   }

@@ -160,7 +160,6 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static UInt128Ex operator ~(UInt128Ex left)
   {
-    //One-Complementare
     return new UInt128Ex(~left.HI, ~left.LO);
   }
   #endregion
@@ -176,7 +175,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static UInt128Ex operator -(UInt128Ex value)
   {
-    return ~value + 1; //Muss genau zero - value ergeben.
+    return ~value + 1;
   }
 
   #endregion
@@ -364,7 +363,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     if (position > 63)
       return (int)((this.HI >> (position - 64)) & 1UL);
     return (int)((this.LO >> position) & 1UL);
-  } 
+  }
 
   internal int Length
   {
@@ -1006,6 +1005,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked UInt128Ex(float value)
   {
+    if (value < 0f) throw new OverflowException(nameof(value));
     return checked((UInt128Ex)(double)value);
   }
 
@@ -1013,7 +1013,6 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   public static explicit operator UInt128Ex(double value)
   {
     if (double.IsInfinity(value) || double.IsNaN(value))
-      //return MinValue;
       throw new OverflowException(nameof(value));
 
     if (double.IsFinite(value))
@@ -1044,35 +1043,25 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     var result = new ulong[2];
     int[] bits = decimal.GetBits(decimal.Truncate(value));
     var uints = new[] { (uint)bits[0], (uint)bits[1], (uint)bits[2], 0u };
+    Buffer.BlockCopy(uints, 0, result, 0, TypeSize);
 
     if (value < 0)
     {
-      Buffer.BlockCopy(uints, 0, result, 0, TypeSize);
-
-      //NegateUnsigned
       var lo = (ulong)(-(long)result[0]);
       var hi = ((0 == result[0]) ? (ulong)(-(long)result[1]) : (ulong)(-1 - (long)result[1]));
       return new(hi, lo);
     }
 
-    Buffer.BlockCopy(uints, 0, result, 0, TypeSize);
     return new(result[1], result[0]);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked UInt128Ex(decimal value)
   {
-    if (decimal.IsNegative(value)) throw new ArgumentOutOfRangeException(nameof(value));
-
-    var result = new ulong[2];
-    int[] bits = decimal.GetBits(decimal.Truncate(value));
-    var uints = new[] { (uint)bits[0], (uint)bits[1], (uint)bits[2], 0u };
-
-    Buffer.BlockCopy(uints, 0, result, 0, TypeSize);
-    return new(result[1], result[0]);
+    if (decimal.IsNegative(value)) 
+      throw new ArgumentOutOfRangeException(nameof(value));
+    return (UInt128Ex)value;
   }
-
-
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator UInt128Ex(Int128Ex value)
@@ -1405,7 +1394,6 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked decimal(UInt128Ex value)
   {
-
     ulong lo64 = value.LO;
 
     if (value.HI <= uint.MaxValue)
@@ -1419,7 +1407,9 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator float(UInt128Ex value)
   {
-    return (float)(double)value;
+    var dbl = (double)value;
+    if (dbl <= float.MaxValue) return (float)dbl;
+    throw new OverflowException(nameof(value));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1464,12 +1454,9 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     if (val.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
     
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
-    var tmp = Converter(bytesvalue, 10, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, TypeSize);
-
-    var bytes = new byte[TypeSize];
-    Array.Copy(tmp, bytes, TypeSize);
+    var bytes = Converter(bytesvalue, 10, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, TypeSize);
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
@@ -1487,12 +1474,9 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
 
     var length = RealLength(val, TypeSize * 8) / 8;
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
-    var tmp = Converter(bytesvalue, 2, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, length);
-
-    var bytes = new byte[TypeSize];
-    Array.Copy(tmp, bytes, TypeSize);
+    var bytes = Converter(bytesvalue, 2, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, length);
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
@@ -1510,12 +1494,9 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     if (val.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
-    var tmp = Converter(bytesvalue, 8, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, TypeSize);
-
-    var bytes = new byte[TypeSize];
-    Array.Copy(tmp, bytes, TypeSize);
+    var bytes = Converter(bytesvalue, 8, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, TypeSize);
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
@@ -1538,12 +1519,9 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     if (val.Length > TypeSize * 2 + 1) throw new ArgumentOutOfRangeException(nameof(value));
 
     var bytes = TrimFirst(val).ToArray().Select(s => dict[s]).ToArray();
-    var tmp = Converter(bytes, 16, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, TypeSize);
-
-    bytes = new byte[TypeSize];
-    Array.Copy(tmp, bytes, TypeSize);
+    bytes = Converter(bytes, 16, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, TypeSize);
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);

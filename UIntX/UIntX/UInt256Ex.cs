@@ -697,6 +697,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     return this == other;
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static bool operator ==(UInt256Ex left, UInt256Ex right)
   {
     if (left.LLO != right.LLO) return false;
@@ -1199,7 +1200,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked UInt256Ex(float value)
   {
-    if (value < 0) throw new OverflowException(nameof(value));
+    if (value < 0f) throw new OverflowException(nameof(value));
     return (UInt256Ex)value;
   }
 
@@ -1219,7 +1220,8 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked UInt256Ex(decimal value)
   {
-    if (decimal.IsNegative(value)) throw new ArgumentOutOfRangeException(nameof(value));
+    if (decimal.IsNegative(value)) 
+      throw new ArgumentOutOfRangeException(nameof(value));
     return (UInt256Ex)value;
   }
 
@@ -1531,7 +1533,9 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked float(UInt256Ex value)
   {
-    return checked((float)(double)value);
+    var dbl = (double)value;
+    if (dbl <= float.MaxValue) return (float)dbl;
+    throw new OverflowException(nameof(value));
   }
 
 

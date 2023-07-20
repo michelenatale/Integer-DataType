@@ -1303,42 +1303,23 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked double(Int512Ex value)
   {
-    const double pow_2_511 = 6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042048.0;
-    const double pow_2_511n = -6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042048.0;
-
-    double tmp;
-    if (value.Sign == -1)
-    {
-      value = -value;
-      tmp = -(double)(UInt512Ex)value;
-      if (tmp >= pow_2_511n) return tmp;
-    }
-    else
-    {
-      tmp = (double)(UInt512Ex)value;
-      if (tmp < pow_2_511) return tmp;
-    }
-
-    throw new NotImplementedException();
+    return (double)value;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked decimal(Int512Ex value)
   {
-    const double pow_2_511 = 6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042048.0;
-    const double pow_2_511n = -6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042048.0;
-
     double tmp;
     if (value.Sign == -1)
     {
       value = -value;
       tmp = -(double)(UInt512Ex)value;
-      if (tmp >= pow_2_511n) return -(decimal)(UInt512Ex)value;
+      if (tmp >= (double)decimal.MinValue) return -(decimal)(UInt512Ex)value;
     }
     else
     {
       tmp = (double)(UInt512Ex)value;
-      if (tmp > pow_2_511) return (decimal)(UInt512Ex)value;
+      if (tmp <= (double)decimal.MaxValue) return (decimal)(UInt512Ex)value;
     }
     throw new NotImplementedException();
   }
@@ -1346,20 +1327,17 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked float(Int512Ex value)
   {
-    const double pow_2_511 = 6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042048.0;
-    const double pow_2_511n = -6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042048.0;
-
     double tmp;
     if (value.Sign == -1)
     {
       value = -value;
       tmp = -(double)(UInt512Ex)value;
-      if (tmp >= pow_2_511n) return -(float)(UInt512Ex)value;
+      if (tmp >= float.MinValue) return -(float)(UInt512Ex)value;
     }
     else
     {
       tmp = (double)(UInt512Ex)value;
-      if (tmp > pow_2_511) return (float)(UInt512Ex)value;
+      if (tmp <= float.MaxValue) return (float)(UInt512Ex)value;
     }
     throw new NotImplementedException();
   }

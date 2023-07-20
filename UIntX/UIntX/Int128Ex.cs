@@ -322,6 +322,7 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     UInt128Ex l = left.Sign == -1 ? (UInt128Ex)Abs(left) : (UInt128Ex)left;
     UInt128Ex r = right.Sign == -1 ? (UInt128Ex)Abs(right) : (UInt128Ex)right;
     UInt128Ex lr = l % r;
+
     var result = (Int128Ex)lr;
     if (left.Sign == 1) return result;
     return -result;
@@ -850,8 +851,9 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   public static explicit operator checked Int128Ex(double value)
   {
     const double pow_2_127 = 170141183460469231731687303715884105728.0;
+    const double pow_2_127n = -170141183460469231731687303715884105728.0;
 
-    if (value < -pow_2_127) throw new ArgumentOutOfRangeException(nameof(value));
+    if (value < pow_2_127n) throw new ArgumentOutOfRangeException(nameof(value));
     if (double.IsInfinity(value)) throw new OverflowException(nameof(value));
     if (value >= pow_2_127) throw new ArgumentOutOfRangeException(nameof(value));
     if (double.IsNaN(value)) throw new OverflowException(nameof(value));
@@ -1176,63 +1178,41 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked double(Int128Ex value)
   {
-    const double pow_2_127 = 170141183460469231731687303715884105728.0;
-    const double pow_2_127n = -170141183460469231731687303715884105728.0;
-
-    double tmp;
-    if (value.Sign == -1)
-    {
-      value = -value;
-      tmp = -(double)(UInt128Ex)value;
-      if (tmp >= pow_2_127n) return tmp;
-    }
-    else
-    {
-      tmp = (double)(UInt128Ex)value;
-      if (tmp < pow_2_127) return tmp;
-    }
-
-    throw new NotImplementedException();
+    return (double)value;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked decimal(Int128Ex value)
   {
-    const double pow_2_127 = 170141183460469231731687303715884105728.0;
-    const double pow_2_127n = -170141183460469231731687303715884105728.0;
-
     double tmp;
     if (value.Sign == -1)
     {
       value = -value;
       tmp = -(double)(UInt128Ex)value;
-      if (tmp >= pow_2_127n) return -(decimal)(UInt128Ex)value;
+      if (tmp >= (double)decimal.MinValue) return -(decimal)(UInt128Ex)value;
     }
     else
     {
       tmp = (double)(UInt128Ex)value;
-      if (tmp > pow_2_127) return (decimal)(UInt128Ex)value;
+      if (tmp <= (double)decimal.MaxValue) return (decimal)(UInt128Ex)value;
     }
     throw new NotImplementedException();
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked float(Int128Ex value)
-  {
-    const double pow_2_127 = 170141183460469231731687303715884105728.0;
-    const double pow_2_127n = -170141183460469231731687303715884105728.0;
-
+  { 
     double tmp;
     if (value.Sign == -1)
     {
       value = -value;
       tmp = -(double)(UInt128Ex)value;
-      if (tmp > pow_2_127n) return -(float)(UInt128Ex)value;
+      if (tmp >= float.MinValue) return -(float)(UInt128Ex)value;
     }
     else
     {
       tmp = (double)(UInt128Ex)value;
-      if (tmp > pow_2_127) return (float)(UInt128Ex)value;
+      if (tmp <= float.MaxValue) return (float)(UInt128Ex)value;
     }
     throw new NotImplementedException();
   }
@@ -1442,7 +1422,6 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
     if (val.Length == 0) return new Int128Ex();
     if (val.Length == 1 && val[0] == '0') return new Int128Ex();
-    //int cap = Convert.ToInt32(TypeSize * Math.Log(256) / Math.Log(16)) + 1;
     int cap = Convert.ToInt32(TypeSize * 2) + 1;
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 

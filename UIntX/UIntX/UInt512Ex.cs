@@ -1124,7 +1124,7 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked UInt512Ex(float value)
   {
-    if (value < 0) throw new OverflowException(nameof(value));
+    if (value < 0f) throw new OverflowException(nameof(value));
     return (UInt512Ex)value;
   }
 
@@ -1144,7 +1144,8 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked UInt512Ex(decimal value)
   {
-    if (decimal.IsNegative(value)) throw new ArgumentOutOfRangeException(nameof(value));
+    if (decimal.IsNegative(value)) 
+      throw new ArgumentOutOfRangeException(nameof(value));
     return (UInt512Ex)value;
   }
 
@@ -1311,7 +1312,6 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
     ulong lo64 = value.V0;
     uint hi32 = (uint)value.V1;
     return new decimal((int)lo64, (int)(lo64 >> 32), (int)hi32, isNegative: false, scale: 0);
-    //return new decimal((int)(value.V0 & 0xFFFFFFFF), (int)(value.V1 & 0xFFFFFFFF), (int)(value.V2 & 0xFFFFFFFF),isNegative: false, scale:0);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1391,9 +1391,6 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static explicit operator checked decimal(UInt512Ex value)
   {
-    //if (value.V1 <= uint.MaxValue)
-    //  return new decimal((int)(value.V0 & 0xFFFFFFFF), (int)(value.V1 & 0xFFFFFFFF), (int)(value.V2 & 0xFFFFFFFF), isNegative: false, scale: 0);
-
     if (value.V1 <= uint.MaxValue)
     {
       ulong lo64 = value.V0;
@@ -1404,7 +1401,12 @@ public readonly struct UInt512Ex : IUIntXEx<UInt512Ex>, IUInt512Ex<UInt512Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static explicit operator checked float(UInt512Ex value) => checked((float)(double)value);
+  public static explicit operator checked float(UInt512Ex value)
+  {
+    var dbl = (double)value;
+    if (dbl <= float.MaxValue) return (float)dbl;
+    throw new OverflowException(nameof(value));
+  }
 
   #endregion
 
