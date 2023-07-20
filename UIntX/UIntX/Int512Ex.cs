@@ -1344,23 +1344,56 @@ public readonly struct Int512Ex : IUIntXEx<Int512Ex>, IInt512Ex<Int512Ex>
 
   #region Conversion to Methodes
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public TypeCode GetTypeCode() => TypeCode.Object;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public bool ToBoolean(IFormatProvider? provider) => !this.IsZero;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public byte ToByte(IFormatProvider? provider) => (byte)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public char ToChar(IFormatProvider? provider) => (char)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public DateTime ToDateTime(IFormatProvider? provider) =>
     Convert.ToDateTime(this.ToDecimal(provider), provider);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public decimal ToDecimal(IFormatProvider? provider) => (decimal)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public double ToDouble(IFormatProvider? provider) => (double)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public short ToInt16(IFormatProvider? provider) => (short)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public int ToInt32(IFormatProvider? provider) => (int)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public long ToInt64(IFormatProvider? provider) => (long)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public sbyte ToSByte(IFormatProvider? provider) => (sbyte)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public float ToSingle(IFormatProvider? provider) => (float)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public string ToString(IFormatProvider? provider) => throw new NotImplementedException();
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public object ToType(Type conversionType, IFormatProvider? provider) => throw new NotImplementedException();
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public ushort ToUInt16(IFormatProvider? provider) => (ushort)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public uint ToUInt32(IFormatProvider? provider) => (uint)this;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public ulong ToUInt64(IFormatProvider? provider) => (ulong)this;
 
   #endregion
