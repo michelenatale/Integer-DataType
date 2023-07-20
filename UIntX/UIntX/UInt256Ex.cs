@@ -1574,12 +1574,9 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     if (val.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
-    var tmp = Converter(bytesvalue, 10, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, TypeSize);
-
-    var bytes = new byte[TypeSize];
-    Array.Copy(tmp, bytes, TypeSize);
+    var bytes = Converter(bytesvalue, 10, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, TypeSize); 
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
@@ -1597,12 +1594,9 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var length = RealLength(val, TypeSize * 8) / 8;
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
-    var tmp = Converter(bytesvalue, 2, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, length);
-
-    var bytes = new byte[TypeSize];
-    Array.Copy(tmp, bytes, TypeSize);
+    var bytes = Converter(bytesvalue, 2, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, length); 
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
@@ -1621,12 +1615,9 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
-    var tmp = Converter(bytesvalue, 8, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, TypeSize);
-
-    var bytes = new byte[TypeSize];
-    Array.Copy(tmp, bytes, TypeSize);
+    var bytes = Converter(bytesvalue, 8, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, TypeSize); 
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);
@@ -1645,18 +1636,14 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
 
     var val = string.Join("", value.ToArray()).Replace("_", string.Empty);
     if (val.Length == 0) return new UInt256Ex();
-    if (val.Length == 1 && val[0] == '0') return new UInt256Ex();
-    //int cap = Convert.ToInt32(TypeSize * Math.Log(256) / Math.Log(16)) + 1;
+    if (val.Length == 1 && val[0] == '0') return new UInt256Ex(); 
     int cap = Convert.ToInt32(TypeSize * 2) + 1;
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 
-    var bytes = TrimFirst(val).ToArray().Select(s => dict[s]).ToArray();
-    var tmp = Converter(bytes, 16, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, TypeSize);
-
-    bytes = new byte[TypeSize];
-    Array.Copy(tmp, bytes, TypeSize);
+    var bytesvalue = TrimFirst(val).ToArray().Select(s => dict[s]).ToArray();
+    var bytes = Converter(bytesvalue, 16, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, TypeSize);
 
     var result = new ulong[TypeSize / 8];
     Buffer.BlockCopy(bytes, 0, result, 0, TypeSize);

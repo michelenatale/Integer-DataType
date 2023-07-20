@@ -1518,8 +1518,8 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     if (val.Length == 1 && val[0] == '0') return new UInt128Ex();
     if (val.Length > TypeSize * 2 + 1) throw new ArgumentOutOfRangeException(nameof(value));
 
-    var bytes = TrimFirst(val).ToArray().Select(s => dict[s]).ToArray();
-    bytes = Converter(bytes, 16, 256);
+    var bytesvalue = TrimFirst(val).ToArray().Select(s => dict[s]).ToArray();
+    var bytes = Converter(bytesvalue, 16, 256);
     Array.Reverse(bytes);
     Array.Resize(ref bytes, TypeSize);
 

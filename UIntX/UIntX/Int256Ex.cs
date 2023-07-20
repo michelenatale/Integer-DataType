@@ -1517,10 +1517,10 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
 
     var length = RealLength(val, TypeSize * 8) / 8;
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
-    var tmp = Converter(bytesvalue, 2, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, length);
-    return ToInt256Ex(tmp);
+    var bytes = Converter(bytesvalue, 2, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, length);
+    return ToInt256Ex(bytes);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1535,10 +1535,10 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 
     var bytesvalue = TrimFirst(val).ToArray().Select(x => byte.Parse(x.ToString())).ToArray();
-    var tmp = Converter(bytesvalue, 8, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, TypeSize);
-    return ToInt256Ex(tmp);
+    var bytes = Converter(bytesvalue, 8, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, TypeSize);
+    return ToInt256Ex(bytes);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1557,11 +1557,11 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     int cap = Convert.ToInt32(TypeSize * 2) + 1;
     if (value.Length > cap) throw new ArgumentOutOfRangeException(nameof(value));
 
-    var bytes = TrimFirst(val).ToArray().Select(s => dict[s]).ToArray();
-    var tmp = Converter(bytes, 16, 256);
-    Array.Reverse(tmp);
-    Array.Resize(ref tmp, TypeSize);
-    return ToInt256Ex(tmp);
+    var bytesvalue = TrimFirst(val).ToArray().Select(s => dict[s]).ToArray();
+    var bytes = Converter(bytesvalue, 16, 256);
+    Array.Reverse(bytes);
+    Array.Resize(ref bytes, TypeSize);
+    return ToInt256Ex(bytes);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
