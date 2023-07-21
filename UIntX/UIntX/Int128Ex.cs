@@ -69,15 +69,12 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     }
   }
 
-  /// <summary>
-  /// One = 1
-  /// </summary> 
+  /// <summary>One = 1</summary> 
   public readonly static Int128Ex One = new(0, 1);
 
-  /// <summary>
-  /// Zero = 0
-  /// </summary> 
+  /// <summary>Zero = 0</summary> 
   public readonly static Int128Ex Zero = new(0, 0);
+
   #endregion
 
   #region Constructors
@@ -291,14 +288,14 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   public static Int128Ex operator /(Int128Ex left, Int128Ex right)
   {
     if (right.IsZero) throw new DivideByZeroException(nameof(right));
-    if (left == right) return Int128Ex.One;
-    if (left.IsZero) return Int128Ex.Zero;
+    if (left == right) return One;
+    if (left.IsZero) return Zero;
     if (right.IsOne) return left;
 
     var sign = left.Sign - right.Sign;
     UInt128Ex l = left.Sign == -1 ? (UInt128Ex)Abs(left) : (UInt128Ex)left;
     UInt128Ex r = right.Sign == -1 ? (UInt128Ex)Abs(right) : (UInt128Ex)right;
-    if (r > l) return Int128Ex.Zero;
+    if (r > l) return Zero;
     UInt128Ex lr = l / r;
     var result = (Int128Ex)lr;
     if (sign == 0) return result;
@@ -408,6 +405,22 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   #region  Comparison Operators
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public int CompareTo(object? obj)
+  {
+    if (obj is Int128Ex other) return CompareTo(other);
+    else if (obj is null) return 1;
+    throw new ArgumentException("Invalid datatype", nameof(obj));
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public int CompareTo(Int128Ex value)
+  {
+    if (this < value) return -1;
+    else if (this > value) return 1;
+    else return 0;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static bool operator <(Int128Ex left, Int128Ex right)
   {
     var llohi = left.ToValues();
@@ -455,7 +468,6 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     return rsign;
   }
 
-
   #endregion
 
   #endregion
@@ -469,29 +481,12 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public int CompareTo(object? obj)
-  {
-    if (obj is Int128Ex other) return CompareTo(other);
-    else if (obj is null) return 1;
-    throw new ArgumentException("Invalid datatype", nameof(obj));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public int CompareTo(Int128Ex value)
-  {
-    if (this < value) return -1;
-    else if (this > value) return 1;
-    else return 0;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int128Ex Abs(Int128Ex value)
   {
     if (value.Sign == 0) return value;
     if (value.Sign == 1) return value;
     return -value;
   }
-
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int128Ex Pow(Int128Ex value, int exp)
@@ -553,7 +548,6 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     return result;
   }
 
-
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int128Ex ToInt128Ex(ReadOnlySpan<byte> bytes, bool littleendian = true)
   {
@@ -593,62 +587,6 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
     return new Int128Ex(bits[1], bits[0]);
   }
-
-  #region Internal Methodes
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static ulong[] BitwiseAnd(ulong[] left, in ulong[] right, in int typesize)
-  {
-    var result = new ulong[typesize];
-    for (var i = 0; i < typesize; i++)
-      result[i] = left[i] & right[i];
-    return result;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] TwosComplement(uint[] value)
-  {
-    var length = value.Length;
-    var result = new uint[length];
-
-    var carry = 1ul;
-    for (var i = 0; i < length; i++)
-    {
-      var digit = ~value[i] + carry;
-      result[i] = (uint)digit;
-      carry = digit >> 32;
-    }
-    if (carry != 0)
-    {
-      result = new uint[length + 1];
-      result[length] = 1;
-    }
-
-    return result;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static ulong[] TwosComplement(ulong[] value)
-  {
-    //https://www.exploringbinary.com/twos-complement-converter/
-    UInt128Ex c = 1ul, d;
-    var length = value.Length;
-    var result = new ulong[length];
-    for (var i = 0; i < length; i++)
-    {
-      d = ~value[i] + c;
-      result[i] = (ulong)d;
-      c = d >> 64;
-    }
-    if (c != 0)
-    {
-      result = new ulong[length + 1];
-      result[length] = 1;
-    }
-    return result;
-  }
-
-  #endregion
 
   #endregion
 
@@ -773,6 +711,40 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
 
     return data.Take(length - count).Reverse().ToArray();
   }
+
+  #region Internal Methodes
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static ulong[] BitwiseAnd(ulong[] left, in ulong[] right, in int typesize)
+  {
+    var result = new ulong[typesize];
+    for (var i = 0; i < typesize; i++)
+      result[i] = left[i] & right[i];
+    return result;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static ulong[] TwosComplement(ulong[] value)
+  {
+    //https://www.exploringbinary.com/twos-complement-converter/
+    UInt128Ex c = 1ul, d;
+    var length = value.Length;
+    var result = new ulong[length];
+    for (var i = 0; i < length; i++)
+    {
+      d = ~value[i] + c;
+      result[i] = (ulong)d;
+      c = d >> 64;
+    }
+    if (c != 0)
+    {
+      result = new ulong[length + 1];
+      result[length] = 1;
+    }
+    return result;
+  }
+
+  #endregion
 
   #endregion
 
@@ -1462,7 +1434,34 @@ public readonly struct Int128Ex : IUIntXEx<Int128Ex>, IInt128Ex<Int128Ex>
     var length = data.Length - cz;
     while (length++ % typesize != 0) ;
     return length - 1;
-  } 
+  }
+
+  #region Internal Methodes
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static uint[] TwosComplement(uint[] value)
+  {
+    //https://www.exploringbinary.com/twos-complement-converter/
+    var length = value.Length;
+    var result = new uint[length];
+
+    var carry = 1ul;
+    for (var i = 0; i < length; i++)
+    {
+      var digit = ~value[i] + carry;
+      result[i] = (uint)digit;
+      carry = digit >> 32;
+    }
+    if (carry != 0)
+    {
+      result = new uint[length + 1];
+      result[length] = 1;
+    }
+
+    return result;
+  }
+
+  #endregion
 
   #endregion
 

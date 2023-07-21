@@ -534,6 +534,22 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   #region  Comparison Operators
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public int CompareTo(object? value)
+  {
+    if (value is UInt128Ex other) return this.CompareTo(other);
+    else if (value is null) return 1;
+    else throw new ArgumentException($"data type is incorrect", nameof(value));
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public int CompareTo(UInt128Ex value)
+  {
+    if (this < value) return -1;
+    else if (this > value) return 1;
+    else return 0;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static bool operator <(UInt128Ex left, UInt128Ex right)
   {
     return left.HI < right.HI || left.HI == right.HI && left.LO < right.LO;
@@ -564,10 +580,14 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   #region Number Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static UInt128Ex Abs(UInt128Ex value)
-  {
-    return value;
-  }
+  public static UInt128Ex Abs(UInt128Ex value) => value;
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public UInt128Ex Copy()=> new UInt128Ex(this);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public readonly override int GetHashCode() =>
+    (int)(this.HI ^ (2 * this.LO));
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static UInt128Ex Pow(UInt128Ex value, int exp)
@@ -606,10 +626,8 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   public static bool IsPowerTwo(UInt128Ex value) => PopCount(value) == 1u;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public Span<byte> ToSpan(bool littleendian = true)
-  {
-    return this.ToBytes(littleendian);
-  }
+  public Span<byte> ToSpan(bool littleendian = true) =>
+    this.ToBytes(littleendian);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public byte[] ToBytes(bool littleendian = true)
@@ -626,12 +644,6 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   {
     if (littleendian) return new ulong[] { this.LO, this.HI };
     return new ulong[] { this.HI, this.LO };
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public UInt128Ex Copy()
-  {
-    return new UInt128Ex(this);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -675,91 +687,23 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public int CompareTo(object? value)
-  {
-    if (value is UInt128Ex other) return this.CompareTo(other);
-    else if (value is null) return 1;
-    else throw new ArgumentException($"data type is incorrect", nameof(value));
-  }
+  internal static UInt128Ex PopCount(UInt128Ex value) => 
+    ulong.PopCount(value.LO) + ulong.PopCount(value.HI);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public int CompareTo(UInt128Ex value)
+  internal static UInt128Ex MulLOHI(UInt128Ex left, UInt128Ex right, out UInt128Ex lower)
   {
-    if (this < value) return -1;
-    else if (this > value) return 1;
-    else return 0;
+    UInt128Ex al = left.LO, ah = left.HI, bl = right.LO, bh = right.HI;
+    UInt128Ex ml = al * bl, t = ah * bl + ml.HI, tl = al * bh + t.LO;
+    UInt128Ex hi = ah * bh + t.HI + tl.HI, lo = new(tl.LO, ml.LO);
+    UInt128Ex lo123 = tl << 64 | (ulong)ml;
+    if (lo != lo123) Debugger.Break();
+    lower = lo;
+    return hi;
   }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly override int GetHashCode()
-  {
-    return (int)(this.HI ^ (2 * this.LO));
-  }
+  #region Internal Methodes
 
-
-  [SkipLocalsInit]
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] Pow(uint[] value, int exp, int tsize)
-  {
-    if (exp < 0)
-      throw new ArgumentOutOfRangeException(nameof(exp));
-
-    uint[] result = new uint[tsize];
-    result[0] = 1;
-    while (exp != 0)
-    {
-      if ((exp & 1) == 1)
-        result = Multiplication(value, result, tsize, out _);
-      value = Multiplication(value, value, tsize, out _);
-      exp >>= 1;
-    }
-    return result;
-  }
-
-  [SkipLocalsInit]
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] PowerOfTen(int exp, int tsize, out bool overflow)
-  {
-    if (exp < 0)
-      throw new ArgumentOutOfRangeException(nameof(exp));
-
-    overflow = true;
-    var max = (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize * 8)));
-    if (exp > max) return new uint[tsize];
-
-    overflow = false;
-    if (exp == 0) { var a = new uint[tsize]; a[0] = 1; return a; }
-    if (exp == 1) { var a = new uint[tsize]; a[0] = 10; return a; }
-
-    var result = new uint[tsize]; result[0] = 10;
-    var expui = result.ToArray();
-    for (var i = 1; i < exp; i++)
-      result = Multiplication(result, expui, tsize, out overflow);
-    if (exp > max) overflow = true;
-    return result;
-  }
-
- 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] PowerOfTwo(int exp, int tsize, out bool overflow)
-  {
-    overflow = true;
-    var max = 4 * 32;
-    if (exp >= max)
-      return new uint[tsize];
-
-    overflow = false;
-    if (exp == 0) { var a = new uint[tsize]; a[0] = 1; return a; }
-    if (exp == 1) { var a = new uint[tsize]; a[0] = 2; return a; }
-
-    var result = new uint[tsize]; result[0] = 2;
-    var expui = result.ToArray();
-    for (var i = 1; i < exp; i++)
-      result = Multiplication(result, expui, tsize, out overflow);
-    if (exp >= max) overflow = true;
-    return result;
-  }
- 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] Multiplication(uint[] left, in uint[] right, int tsize, out bool over_flow)
   {
@@ -799,32 +743,74 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     return result.Take(tsize).ToArray();
   }
 
-  [SkipLocalsInit]
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  internal static UInt128Ex PopCount(UInt128Ex value) => 
-    ulong.PopCount(value.LO) + ulong.PopCount(value.HI);
-
-  [SkipLocalsInit]
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  internal static UInt128Ex MulLOHI(UInt128Ex left, UInt128Ex right, out UInt128Ex lower)
+  private static uint[] PowerOfTen(int exp, int tsize, out bool overflow)
   {
-    UInt128Ex al = left.LO, ah = left.HI, bl = right.LO, bh = right.HI;
-    UInt128Ex ml = al * bl, t = ah * bl + ml.HI, tl = al * bh + t.LO;
-    UInt128Ex hi = ah * bh + t.HI + tl.HI, lo = new(tl.LO, ml.LO);
-    UInt128Ex lo123 = tl << 64 | (ulong)ml;
-    if (lo != lo123) Debugger.Break();
-    lower = lo;
-    return hi;
+    if (exp < 0)
+      throw new ArgumentOutOfRangeException(nameof(exp));
+
+    overflow = true;
+    var max = (int)double.Truncate(Math.Log10(Math.Pow(2, TypeSize * 8)));
+    if (exp > max) return new uint[tsize];
+
+    overflow = false;
+    if (exp == 0) { var a = new uint[tsize]; a[0] = 1; return a; }
+    if (exp == 1) { var a = new uint[tsize]; a[0] = 10; return a; }
+
+    var result = new uint[tsize]; result[0] = 10;
+    var expui = result.ToArray();
+    for (var i = 1; i < exp; i++)
+      result = Multiplication(result, expui, tsize, out overflow);
+    if (exp > max) overflow = true;
+    return result;
   }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static uint[] Pow(uint[] value, int exp, int tsize)
+  {
+    if (exp < 0)
+      throw new ArgumentOutOfRangeException(nameof(exp));
+
+    uint[] result = new uint[tsize];
+    result[0] = 1;
+    while (exp != 0)
+    {
+      if ((exp & 1) == 1)
+        result = Multiplication(value, result, tsize, out _);
+      value = Multiplication(value, value, tsize, out _);
+      exp >>= 1;
+    }
+    return result;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static uint[] PowerOfTwo(int exp, int tsize, out bool overflow)
+  {
+    overflow = true;
+    var max = 4 * 32;
+    if (exp >= max)
+      return new uint[tsize];
+
+    overflow = false;
+    if (exp == 0) { var a = new uint[tsize]; a[0] = 1; return a; }
+    if (exp == 1) { var a = new uint[tsize]; a[0] = 2; return a; }
+
+    var result = new uint[tsize]; result[0] = 2;
+    var expui = result.ToArray();
+    for (var i = 1; i < exp; i++)
+      result = Multiplication(result, expui, tsize, out overflow);
+    if (exp >= max) overflow = true;
+    return result;
+  }
+
+  #endregion
+
   #endregion
 
   #region Formatting Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public override string ToString()
-  {
-    return this.ToString(10);
-  }
+  public override string ToString() => this.ToString(10);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public readonly unsafe string ToString(int radix)
@@ -1182,13 +1168,13 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
 
   #region Conversion To Methodes
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public string ToString(IFormatProvider? provider) => 
+    throw new NotImplementedException();
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public string ToString(IFormatProvider? provider) => throw new NotImplementedException();
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public object ToType(Type conversionType, IFormatProvider? provider) => throw new NotImplementedException();
-
+  public object ToType(Type conversionType, IFormatProvider? provider) => 
+    throw new NotImplementedException();
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public TypeCode GetTypeCode() => TypeCode.Object;
@@ -1203,7 +1189,8 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   public char ToChar(IFormatProvider? provider) => (char)this;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public DateTime ToDateTime(IFormatProvider? provider) => Convert.ToDateTime(this.ToDecimal(provider), provider);
+  public DateTime ToDateTime(IFormatProvider? provider) => 
+    Convert.ToDateTime(this.ToDecimal(provider), provider);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public decimal ToDecimal(IFormatProvider? provider) => (decimal)this;
@@ -1234,7 +1221,6 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public ulong ToUInt64(IFormatProvider? provider) => (ulong)this;
-
 
   #endregion
 
@@ -1418,7 +1404,6 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
     return checked((float)(double)value);
   }
 
-
   #endregion
 
   #endregion
@@ -1594,6 +1579,7 @@ public readonly struct UInt128Ex : IUIntXEx<UInt128Ex>, IUInt128Ex<UInt128Ex>
   #endregion
 
   #endregion
+
 }
 
 

@@ -140,18 +140,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     return result;
   }
 
-  //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-  //public static ulong[] BitwiseAnd(ulong[] left, in ulong right, in int typesize)
-  //{
-  //  var result = new ulong[typesize];
-  //  if (left.SequenceEqual(result)) return result;
-
-  //  result[0] = left[0] & right;
-  //  for (var i = 1; i < typesize; i++)
-  //    result[i] = left[i] & 0u;
-  //  return result;
-  //}
-
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static ulong[] BitwiseAnd(ulong[] left, in ulong[] right, in int typesize)
   {
@@ -160,7 +148,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
       result[i] = left[i] & right[i];
     return result;
   }
-
  
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] BitwiseOr(uint[] left, uint[] right, int typesize)
@@ -171,7 +158,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     return result;
   }
 
-
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static uint[] BitwiseXor(uint[] left, uint[] right, int typesize)
   {
@@ -180,7 +166,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
       result[i] = left[i] ^ right[i];
     return result;
   } 
-
 
   #endregion
 
@@ -197,40 +182,6 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static Int256Ex operator checked -(Int256Ex value) => checked(Zero - value);
  
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static ulong[] TwosComplement(ulong[] value)
-  {
-    var uints = new uint[TypeSize / 4];
-    Buffer.BlockCopy(value, 0, uints, 0, TypeSize);
-
-    var result = new ulong[TypeSize / 8];
-    Buffer.BlockCopy(TwosComplement(uints), 0, result, 0, TypeSize);
-    return result;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] TwosComplement(uint[] value)
-  {
-    //  https://www.exploringbinary.com/twos-complement-converter/
-    var length = value.Length;
-    var result = new uint[length];
-
-    var carry = 1ul;
-    for (var i = 0; i < length; i++)
-    {
-      var digit = ~value[i] + carry;
-      result[i] = (uint)digit;
-      carry = digit >> 32;
-    }
-    if (carry != 0)
-    {
-      result = new uint[length + 1];
-      result[length] = 1;
-    }
-
-    return result;
-  }
-
   #endregion
 
   #region In- Decrement
@@ -999,6 +950,40 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
     return data.Take(length - count).Reverse().ToArray();
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static ulong[] TwosComplement(ulong[] value)
+  {
+    var uints = new uint[TypeSize / 4];
+    Buffer.BlockCopy(value, 0, uints, 0, TypeSize);
+
+    var result = new ulong[TypeSize / 8];
+    Buffer.BlockCopy(TwosComplement(uints), 0, result, 0, TypeSize);
+    return result;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static uint[] TwosComplement(uint[] value)
+  {
+    //  https://www.exploringbinary.com/twos-complement-converter/
+    var length = value.Length;
+    var result = new uint[length];
+
+    var carry = 1ul;
+    for (var i = 0; i < length; i++)
+    {
+      var digit = ~value[i] + carry;
+      result[i] = (uint)digit;
+      carry = digit >> 32;
+    }
+    if (carry != 0)
+    {
+      result = new uint[length + 1];
+      result[length] = 1;
+    }
+
+    return result;
+  }
+
   #endregion
 
   #region Conversion and Parse
@@ -1442,7 +1427,8 @@ public readonly struct Int256Ex : IUIntXEx<Int256Ex>, IInt256Ex<Int256Ex>
   public float ToSingle(IFormatProvider? provider) => (float)this;
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public string ToString(IFormatProvider? provider) => throw new NotImplementedException();
+  public string ToString(IFormatProvider? provider) => 
+    throw new NotImplementedException();
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public object ToType(Type conversionType, IFormatProvider? provider) => 

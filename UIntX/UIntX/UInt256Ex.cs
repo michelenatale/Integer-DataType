@@ -200,7 +200,6 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     return new(BitwiseXor(uil, uir, TypeSize / 4));
   }
 
-
   #region Internal Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -211,7 +210,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     if (value.SequenceEqual(one)) return mv;
     one[0] = 1;
     if (value.SequenceEqual(mv)) return new uint[value.Length];
-    var result = Subtract(mv, value, value.Length);
+    var result = Subtract(mv, value, value.Length, out _);
     return result;
   }
 
@@ -309,7 +308,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    return new(Addition(uil, uir, TypeSize / 4));
+    return new(Addition(uil, uir, TypeSize / 4, out _));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -317,7 +316,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    return new(Subtract(uil, uir, TypeSize / 4));
+    return new(Subtract(uil, uir, TypeSize / 4, out _));
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -352,7 +351,9 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    return new(AdditionChecked(uil, uir, TypeSize / 4));
+    var result = new UInt256Ex(Addition(uil, uir, TypeSize / 4, out var isoverflow));
+    if (!isoverflow) return result;
+    throw new OverflowException($"{nameof(Addition)}.Checked");
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -360,7 +361,9 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   {
     var uil = left.ToUInts();
     var uir = right.ToUInts();
-    return new(SubtractChecked(uil, uir, TypeSize / 4));
+    var result = new UInt256Ex(Subtract(uil, uir, TypeSize / 4, out var isoverflow));
+    if (!isoverflow) return result;
+    throw new OverflowException($"{nameof(Subtract)}.Checked");
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -382,9 +385,10 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   #region Internal Methodes
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] AdditionChecked(in uint[] left, in uint[] right, in int size)
+  private static uint[] Addition(in uint[] left, in uint[] right, in int size, out bool isoverflow)
   {
     uint r = 0U;
+    isoverflow = false;
     var rshift = (8 * size) - 1;
     var result = new uint[size];
     for (var i = 0; i < size; i++)
@@ -392,30 +396,15 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       result[i] = left[i] + right[i] + r;
       r = ((left[i] & right[i]) | ((left[i] | right[i]) & (~result[i]))) >> rshift;
     }
-    if (r == 0)
-      return result;
-
-    throw new OverflowException(nameof(AdditionChecked));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] Addition(in uint[] left, in uint[] right, in int size)
-  {
-    uint r = 0U;
-    var rshift = (8 * size) - 1;
-    var result = new uint[size];
-    for (var i = 0; i < size; i++)
-    {
-      result[i] = left[i] + right[i] + r;
-      r = ((left[i] & right[i]) | ((left[i] | right[i]) & (~result[i]))) >> rshift;
-    }
+    if (r != 0) isoverflow = true;
     return result;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] SubtractChecked(in uint[] left, in uint[] right, in int size)
+  private static uint[] Subtract(in uint[] left, in uint[] right, in int size, out bool isoverflow)
   {
     var r = 0U;
+    isoverflow = false;
     var rshift = (8 * size) - 1;
     var result = new uint[size];
     for (var i = 0; i < size; i++)
@@ -423,22 +412,7 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       result[i] = left[i] - right[i] - r;
       r = (((~left[i]) & right[i]) | (~(left[i] ^ right[i])) & result[i]) >> rshift;
     }
-    if (r == 0)
-      return result;
-    throw new OverflowException(nameof(SubtractChecked));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static uint[] Subtract(in uint[] left, in uint[] right, in int size)
-  {
-    var r = 0U;
-    var rshift = (8 * size) - 1;
-    var result = new uint[size];
-    for (var i = 0; i < size; i++)
-    {
-      result[i] = left[i] - right[i] - r;
-      r = (((~left[i]) & right[i]) | (~(left[i] ^ right[i])) & result[i]) >> rshift;
-    }
+    if (r != 0) isoverflow = true;
     return result;
   }
 
@@ -513,8 +487,8 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       result = LeftShift(result, 1, typesize);
       if (GreaterThenEqualLE(l, r, typesize))
       {
-        l = Subtract(l, r, typesize);
-        result = Addition(result, one, typesize); // result.Lo |= 1;
+        l = Subtract(l, r, typesize, out _);
+        result = Addition(result, one, typesize, out _); // result.Lo |= 1;
       }
       r = RightShift(r, 1, typesize);
     }
@@ -716,6 +690,22 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
   #endregion
 
   #region Comparison Operators
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public int CompareTo(object? value)
+  {
+    if (value is UInt256Ex other) return this.CompareTo(other);
+    else if (value is null) return 1;
+    else throw new ArgumentException($"data type is incorrect", nameof(value));
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public int CompareTo(UInt256Ex value)
+  {
+    if (this < value) return -1;
+    else if (this > value) return 1;
+    else return 0;
+  }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static bool operator <(UInt256Ex left, UInt256Ex right)
@@ -954,22 +944,6 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     if (!littleendian) Array.Reverse(bits);
 
     return new (bits);
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public int CompareTo(object? value)
-  {
-    if (value is UInt256Ex other) return this.CompareTo(other);
-    else if (value is null) return 1;
-    else throw new ArgumentException($"data type is incorrect", nameof(value));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public int CompareTo(UInt256Ex value)
-  {
-    if (this < value) return -1;
-    else if (this > value) return 1;
-    else return 0;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1538,7 +1512,6 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
     throw new OverflowException(nameof(value));
   }
 
-
   #endregion
 
   #endregion
@@ -1561,7 +1534,6 @@ public readonly struct UInt256Ex : IUIntXEx<UInt256Ex>, IUInt256Ex<UInt256Ex>
       _ => throw new ArgumentException("radix 2, 8, 10, 16", nameof(radix)),
     };
   }
-
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private static UInt256Ex FromDecSystem(ReadOnlySpan<char> value)
